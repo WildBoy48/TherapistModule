@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "TherapistModule": {
+    "therapist-module": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -60,10 +60,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "TherapistModule:build:production"
+              "buildTarget": "therapist-module:build:production"
             },
             "development": {
-              "buildTarget": "TherapistModule:build:development"
+              "buildTarget": "therapist-module:build:development"
             }
           },
           "defaultConfiguration": "development"
