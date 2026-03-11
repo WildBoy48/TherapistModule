@@ -1,0 +1,26 @@
+@media (min-width: 992px) {
+
+    .navbar-expand-lg .navbar-collapse,
+    .navbar-expand-lg .navbar-nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar {
+        width: 280px;
+        height: 100vh;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar-nav {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .navbar-brand {
+        margin-left: 0.5em;
+        padding-bottom: 0.5rem;
+        font-weight: bold;
+    }
+}
