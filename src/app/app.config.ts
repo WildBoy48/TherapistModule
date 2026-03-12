@@ -4,6 +4,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { getAuth, provideAuth } from '@angular/fire/auth';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,10 +18,9 @@ export const appConfig: ApplicationConfig = {
         apiKey: 'AIzaSyApqMhm8L_nZUWSNNsFc8cGIbFufk-wdvI',
         authDomain: 'therapist-module.firebaseapp.com',
         messagingSenderId: '931936192365',
-        projectNumber: '931936192365',
-        version: '2',
       }),
     ),
     provideFirestore(() => getFirestore()),
+    provideAuth(() => getAuth()),
   ],
 };

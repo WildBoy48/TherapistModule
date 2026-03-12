@@ -1,0 +1,23 @@
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-container.with-sidebar {
+  display: flex;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.main-content.full-width {
+  width: 100%;
+}
+
+/* Ensure router-outlet container is flexible */
+router-outlet + * {
+  display: contents;
+}

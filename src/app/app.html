@@ -1,7 +1,7 @@
-<div class="d-flex">
-  <app-sidebar></app-sidebar>
+<div class="app-container" [class.with-sidebar]="shouldShowSidebar()">
+  <app-sidebar *ngIf="shouldShowSidebar()"></app-sidebar>
 
-  <div class="flex-grow-1 p-3">
+  <div class="main-content" [class.full-width]="!shouldShowSidebar()">
     <router-outlet></router-outlet>
   </div>
 </div>
