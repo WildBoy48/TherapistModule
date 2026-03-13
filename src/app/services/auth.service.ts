@@ -2,7 +2,6 @@ import { Injectable, NgZone } from '@angular/core';
 import { Auth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, User, authState } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import { UserService } from './user.service';
-import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'

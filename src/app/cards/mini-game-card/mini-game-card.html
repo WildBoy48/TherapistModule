@@ -1,10 +1,23 @@
-<a routerLink="/session-config" class="card-link">
-  <div class="card" style="width: 18rem;">
-    <img [src]="game.image" class="card-img-top" [alt]="game.name">
-    <div class="card-body">
-      <h5 class="card-title">{{ game.name }}</h5>
-      <h6 class="card-subtitle mb-2 text-body-secondary">{{ game.targetGroup }}</h6>
-      <p class="card-text">{{ game.description }}</p>
+@if (isSelectable) {
+  <div class="card-wrapper selectable" (click)="selectGame()" style="cursor: pointer;">
+    <div class="card" style="width: 18rem;">
+      <img [src]="game.image" class="card-img-top" [alt]="game.name">
+      <div class="card-body">
+        <h5 class="card-title">{{ game.name }}</h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary">{{ game.targetGroup }}</h6>
+        <p class="card-text">{{ game.description }}</p>
+      </div>
     </div>
   </div>
-</a>
+} @else {
+  <div class="card-wrapper">
+    <div class="card" style="width: 18rem;">
+      <img [src]="game.image" class="card-img-top" [alt]="game.name">
+      <div class="card-body">
+        <h5 class="card-title">{{ game.name }}</h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary">{{ game.targetGroup }}</h6>
+        <p class="card-text">{{ game.description }}</p>
+      </div>
+    </div>
+  </div>
+}

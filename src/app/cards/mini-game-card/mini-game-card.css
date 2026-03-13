@@ -1,15 +1,15 @@
-.card-link {
-  text-decoration: none;
-  color: inherit;
+.card-wrapper {
   display: inline-block;
-  cursor: pointer;
 }
 
-.card-link:hover {
-  text-decoration: none;
-}
-
-.card-link:hover .card {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+.card {
   transition: box-shadow 0.3s ease;
+}
+
+.card-wrapper.selectable .card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-body button {
+  margin-top: 10px;
 }

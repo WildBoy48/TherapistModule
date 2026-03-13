@@ -14,6 +14,7 @@ export interface MiniGame {
 })
 export class MiniGameService {
   private miniGamesCollection = 'mini-games';
+  private selectedMiniGame: MiniGame | null = null;
 
   constructor(private firestore: Firestore, private ngZone: NgZone) {}
 
@@ -44,5 +45,19 @@ export class MiniGameService {
       console.error('Error fetching mini-games:', error);
       throw error;
     }
+  }
+
+  /**
+   * Set the selected mini-game
+   */
+  setSelectedMiniGame(game: MiniGame | null): void {
+    this.selectedMiniGame = game;
+  }
+
+  /**
+   * Get the currently selected mini-game
+   */
+  getSelectedMiniGame(): MiniGame | null {
+    return this.selectedMiniGame;
   }
 }
