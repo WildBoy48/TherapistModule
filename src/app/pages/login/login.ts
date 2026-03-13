@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -18,6 +17,7 @@ export class Login implements OnInit, OnDestroy {
   isLoading = false;
   errorMessage = '';
   isRegistering = false;
+  registrationSuccess = false;
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -58,9 +58,9 @@ export class Login implements OnInit, OnDestroy {
       
       if (this.isRegistering) {
         await this.authService.register(email, password);
-        this.isRegistering = false;
-        this.loginForm.reset();
         this.errorMessage = 'Registration successful! Please log in.';
+        this.registrationSuccess = true;
+        this.isRegistering = false;
         this.setFormDisabled(false);
       } else {
         await this.authService.login(email, password);
@@ -82,6 +82,7 @@ export class Login implements OnInit, OnDestroy {
     this.isRegistering = !this.isRegistering;
     this.loginForm.reset();
     this.errorMessage = '';
+    this.registrationSuccess = false;
   }
 
   /**

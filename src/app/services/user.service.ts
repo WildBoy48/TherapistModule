@@ -5,10 +5,8 @@ import { User } from '@angular/fire/auth';
 export interface UserProfile {
   id: string;
   email: string;
-  displayName?: string;
   createdAt: Date;
   lastLoginAt: Date;
-  photoURL?: string;
 }
 
 @Injectable({
@@ -28,8 +26,6 @@ export class UserService {
       const userProfile: UserProfile = {
         id: user.uid,
         email: user.email || '',
-        displayName: user.displayName || '',
-        photoURL: user.photoURL || '',
         createdAt: new Date(),
         lastLoginAt: new Date(),
       };

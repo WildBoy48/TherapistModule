@@ -1,10 +1,10 @@
 <a routerLink="/session-config" class="card-link">
   <div class="card" style="width: 18rem;">
-    <img src="imgs/game.jpg" class="card-img-top" alt="game image">
+    <img [src]="game.image" class="card-img-top" [alt]="game.name">
     <div class="card-body">
-      <h5 class="card-title">Game Name</h5>
-      <h6 class="card-subtitle mb-2 text-body-secondary">Game Focus</h6>
-      <p class="card-text">Game Description</p>
+      <h5 class="card-title">{{ game.name }}</h5>
+      <h6 class="card-subtitle mb-2 text-body-secondary">{{ game.targetGroup }}</h6>
+      <p class="card-text">{{ game.description }}</p>
     </div>
   </div>
 </a>

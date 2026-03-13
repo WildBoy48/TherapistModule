@@ -37,12 +37,12 @@
         </div>
       </div>
 
-      <!-- Error Message -->
-      <div class="alert alert-danger" *ngIf="errorMessage && !isRegistering">
+      <!-- Error/Success Message -->
+      <div class="alert alert-danger" *ngIf="errorMessage && !registrationSuccess">
         {{ errorMessage }}
       </div>
       
-      <div class="alert alert-success" *ngIf="errorMessage && isRegistering">
+      <div class="alert alert-success" *ngIf="registrationSuccess">
         {{ errorMessage }}
       </div>
 

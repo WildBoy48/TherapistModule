@@ -1,1 +1,19 @@
-<app-mini-game-card></app-mini-game-card>
+@if (isLoading) {
+  <div class="loading">
+    <p>Loading games...</p>
+  </div>
+}
+
+@if (error) {
+  <div class="error">
+    <p>{{ error }}</p>
+  </div>
+}
+
+@if (!isLoading && !error) {
+  <div class="games-container">
+    @for (game of miniGames; track game.id) {
+      <app-mini-game-card [game]="game"></app-mini-game-card>
+    }
+  </div>
+}
