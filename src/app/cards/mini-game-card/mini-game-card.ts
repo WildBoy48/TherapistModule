@@ -1,11 +1,11 @@
 import { Component, Input } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { MiniGame } from '../../services/mini-game.service';
 import { MiniGameService } from '../../services/mini-game.service';
 
 @Component({
   selector: 'app-mini-game-card',
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './mini-game-card.html',
   styleUrl: './mini-game-card.css',
 })

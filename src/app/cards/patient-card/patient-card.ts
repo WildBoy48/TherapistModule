@@ -1,11 +1,11 @@
 import { Component, Input } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { Patient } from '../../services/patient.service';
 import { PatientService } from '../../services/patient.service';
 
 @Component({
   selector: 'app-patient-card',
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './patient-card.html',
   styleUrl: './patient-card.css',
 })
@@ -29,7 +29,6 @@ export class PatientCard {
     if (event) {
       event.stopPropagation();
     }
-    this.patientService.setSelectedPatient(this.patient);
-    this.router.navigate(['/patient-profile']);
+    this.router.navigate(['/patient-profile'], { state: { patient: this.patient } });
   }
 }

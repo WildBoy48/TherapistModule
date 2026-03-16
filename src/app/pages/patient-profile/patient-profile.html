@@ -1,1 +1,43 @@
-<p>patient-profile works!</p>
+<div class="container row">
+    <div class="info-card col-6 col-lg-5">
+        <div class="card profile-card">
+            <button class="edit-btn" (click)="editPatient()" *ngIf="patient">Edit</button>
+            <div class="card-content" *ngIf="patient">
+                <div class="profile-header">
+                    <img *ngIf="patient.profileImage" [src]="patient.profileImage" alt="Profile" class="profile-image">
+                    <div *ngIf="!patient.profileImage" class="profile-placeholder">No Image</div>
+                    <h2>{{ patient.name }}</h2>
+                </div>
+                <div class="info-section">
+                    <div class="info-item">
+                        <span class="label">Age:</span>
+                        <span class="value">{{ patient.age }} years</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Gender:</span>
+                        <span class="value">{{ patient.gender }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Handedness:</span>
+                        <span class="value">{{ patient.handedness }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Diagnosis:</span>
+                        <span class="value">{{ patient.diagnosis }}</span>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="!patient" class="no-patient">
+                <p>No patient selected</p>
+            </div>
+        </div>
+        <div class="card goals-card" *ngIf="patient">
+            <button class="edit-btn" (click)="editGoals()">Edit</button>
+            <h5>Rehabilitation Goals</h5>
+            <div class="goals-content">
+                <p *ngIf="patient.rehabilitationGoals" class="goals-text">{{ patient.rehabilitationGoals }}</p>
+                <p class="no-goals" *ngIf="!patient.rehabilitationGoals">No goals set yet</p>
+            </div>
+        </div>
+    </div>
+</div>

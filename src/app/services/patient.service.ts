@@ -10,6 +10,7 @@ export interface Patient {
   diagnosis: string;
   profileImage: string;
   therapistId: string;
+  rehabilitationGoals?: string;
 }
 
 @Injectable({
