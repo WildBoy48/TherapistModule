@@ -6,3 +6,28 @@
 .button-group button {
   flex: 1;
 }
+
+.mini-game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.patient-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.patient-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.patient-buttons button {
+  width: 100%;
+  min-width: 150px;
+}
+

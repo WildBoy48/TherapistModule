@@ -1,21 +1,34 @@
 <div class="container">
     <h2 class="mb-4">Session Configuration</h2>
+    
+    <!-- Patient Section -->
+    <div class="row mb-3">
+        @if (selectedPatient) {
+            <div class="col">
+                <div class="patient-container">
+                    <app-patient-card [patient]="selectedPatient" [isSelectable]="false"></app-patient-card>
+                    <div class="patient-buttons">
+                        <button type="button" class="btn btn-primary mb-2" (click)="viewPatientProfile()">Profile</button>
+                        <button type="button" class="btn btn-warning" (click)="changePatient()">Change Patient</button>
+                    </div>
+                </div>
+            </div>
+        } @else {
+            <p class="col">No patient selected...</p>
+            <button type="button" class="btn btn-primary col" routerLink="/patient-selector">Patient List</button>
+        }
+    </div>
+
+    <!-- Mini-Game Section -->
     <div class="row mb-3">
         @if (selectedMiniGame) {
-            <div class="col">
+            <div class="col mini-game-container">
+                <button type="button" class="btn btn-warning mb-3" (click)="changeMiniGame()">Change Mini-Game</button>
                 <app-mini-game-card [game]="selectedMiniGame"></app-mini-game-card>
-                <div class="button-group mt-3">
-                    <button type="button" class="btn btn-danger me-2" (click)="deselectMiniGame()">Deselect</button>
-                    <button type="button" class="btn btn-warning" (click)="changeMiniGame()">Change Mini-Game</button>
-                </div>
             </div>
         } @else {
             <p class="col">No mini-game selected...</p>
             <button type="button" class="btn btn-primary col" routerLink="/mini-game-selector">Mini-Game List</button>
         }
-    </div>
-    <div class="row mb-3">
-        <p class="col">No patient selected...</p>
-        <button type="button" class="btn btn-primary col" routerLink="/patient-selector">Patient List</button>
     </div>
 </div>

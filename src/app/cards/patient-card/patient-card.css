@@ -13,3 +13,19 @@
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   transition: box-shadow 0.3s ease;
 }
+
+.card-wrapper {
+  display: inline-block;
+}
+
+.card {
+  transition: box-shadow 0.3s ease;
+}
+
+.card-wrapper.selectable .card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-body button {
+  margin-top: 10px;
+}

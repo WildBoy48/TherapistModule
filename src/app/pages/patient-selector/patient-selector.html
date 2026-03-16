@@ -1,1 +1,19 @@
-<app-patient-card></app-patient-card>
+@if (isLoading) {
+  <div class="loading">
+    <p>Loading patients...</p>
+  </div>
+}
+
+@if (error) {
+  <div class="error">
+    <p>{{ error }}</p>
+  </div>
+}
+
+@if (!isLoading && !error && patients.length > 0) {
+  <div class="patients-container">
+    @for (patient of patients; track patient.id) {
+      <app-patient-card [patient]="patient" [isSelectable]="true"></app-patient-card>
+    }
+  </div>
+}

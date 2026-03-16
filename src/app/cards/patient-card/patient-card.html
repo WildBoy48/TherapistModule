@@ -1,11 +1,23 @@
-<a routerLink="/session-config" class="card-link">
-  <div class="card" style="width: 18rem;">
-    <img src="imgs/profile.jpg" class="card-img-top" alt="patient profile picture">
-    <div class="card-body">
-      <h5 class="card-title">Patient Name</h5>
-      <h6 class="card-subtitle mb-2 text-body-secondary">Masculino - 40 anos - Destro</h6>
-      <p class="card-text">Isquémico - MCA esquerdo</p>
-      <a routerLink="/patient-profile" class="btn btn-primary" style="width: 100%;" (click)="$event.stopPropagation()">Profile</a>
+@if (isSelectable) {
+  <div class="card-wrapper selectable" (click)="selectPatient()" style="cursor: pointer;">
+    <div class="card" style="width: 18rem;">
+      <img [src]="patient.profileImage" class="card-img-top" [alt]="patient.name">
+      <div class="card-body">
+        <h5 class="card-title">{{ patient.name }}</h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary">{{ patient.gender }} - {{ patient.age }} anos - {{ patient.handedness }}</h6>
+        <p class="card-text">{{ patient.diagnosis }}</p>
+      </div>
     </div>
   </div>
-</a>
+} @else {
+  <div class="card-wrapper">
+    <div class="card">
+      <img [src]="patient.profileImage" class="card-img-top" [alt]="patient.name">
+      <div class="card-body">
+        <h5 class="card-title">{{ patient.name }}</h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary">{{ patient.gender }} - {{ patient.age }} anos - {{ patient.handedness }}</h6>
+        <p class="card-text">{{ patient.diagnosis }}</p>
+      </div>
+    </div>
+  </div>
+}
