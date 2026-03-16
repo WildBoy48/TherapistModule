@@ -1,5 +1,10 @@
-<div class="container row">
-    <div class="info-card col-6 col-lg-5">
+<div class="container-fluid row p-0">
+    <div class="row mb-3">
+        <div class="col">
+            <h2 class="mb-0">Patient Profile</h2>
+        </div>
+    </div>
+    <div class="col-6 col-lg-5">
         <div class="card profile-card">
             <button class="edit-btn" (click)="editPatient()" *ngIf="patient">Edit</button>
             <div class="card-content" *ngIf="patient">
@@ -31,7 +36,7 @@
                 <p>No patient selected</p>
             </div>
         </div>
-        <div class="card goals-card" *ngIf="patient">
+        <div class="card goals-card mt-3" *ngIf="patient">
             <button class="edit-btn" (click)="editGoals()">Edit</button>
             <h5>Rehabilitation Goals</h5>
             <div class="goals-content">
@@ -39,5 +44,35 @@
                 <p class="no-goals" *ngIf="!patient.rehabilitationGoals">No goals set yet</p>
             </div>
         </div>
+
+        <!-- <div class="card therapist-notes-card mt-3" *ngIf="patient">
+            <h5>Notes</h5>
+            <textarea
+                class="therapist-notes-input"
+                rows="3"
+                placeholder="Write observations and follow-up notes here..."
+            ></textarea>
+        </div> -->
     </div>
+
+    <div class="col-6 col-lg-7 pe-0" *ngIf="patient">
+        <div class="card session-history-card">
+            <div class="session-history-header">
+                <h5 class="mb-0">Session History</h5>
+                <button class="see-all-btn" (click)="seeAllSessions()">See all</button>
+            </div>
+
+            <div class="session-list">
+                <div class="session-row" *ngFor="let session of recentSessions">
+                    <div class="session-details">
+                        <div class="session-title">{{ session.title }}</div>
+                        <div class="session-meta">{{ session.date }} | {{ session.duration }}</div>
+                    </div>
+                    <button class="repeat-btn" (click)="repeatSession(session.id)">Repeat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>

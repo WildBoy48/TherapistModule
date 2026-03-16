@@ -1,19 +1,29 @@
-@if (isLoading) {
-  <div class="loading">
-    <p>Loading patients...</p>
+<div class="container-fluid px-0">
+  <div class="row mb-3">
+    <div class="col-12">
+      <h2 class="mb-0">Patients</h2>
+    </div>
   </div>
-}
 
-@if (error) {
-  <div class="error">
-    <p>{{ error }}</p>
-  </div>
-}
+  @if (isLoading) {
+    <div class="loading">
+      <p>Loading patients...</p>
+    </div>
+  }
 
-@if (!isLoading && !error && patients.length > 0) {
-  <div class="patients-container">
-    @for (patient of patients; track patient.id) {
-      <app-patient-card [patient]="patient" [isSelectable]="true"></app-patient-card>
-    }
-  </div>
-}
+  @if (error) {
+    <div class="error">
+      <p>{{ error }}</p>
+    </div>
+  }
+
+  @if (!isLoading && !error && patients.length > 0) {
+    <div class="row g-4">
+      @for (patient of patients; track patient.id) {
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+          <app-patient-card [patient]="patient" [isSelectable]="true"></app-patient-card>
+        </div>
+      }
+    </div>
+  }
+</div>

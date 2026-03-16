@@ -1,19 +1,29 @@
-@if (isLoading) {
-  <div class="loading">
-    <p>Loading games...</p>
+<div class="container-fluid px-0">
+  <div class="row mb-3">
+    <div class="col-12">
+      <h2 class="mb-0">Mini Games</h2>
+    </div>
   </div>
-}
 
-@if (error) {
-  <div class="error">
-    <p>{{ error }}</p>
-  </div>
-}
+  @if (isLoading) {
+    <div class="loading">
+      <p>Loading games...</p>
+    </div>
+  }
 
-@if (!isLoading && !error) {
-  <div class="games-container">
-    @for (game of miniGames; track game.id) {
-      <app-mini-game-card [game]="game" [isSelectable]="true"></app-mini-game-card>
-    }
-  </div>
-}
+  @if (error) {
+    <div class="error">
+      <p>{{ error }}</p>
+    </div>
+  }
+
+  @if (!isLoading && !error) {
+    <div class="row g-4">
+      @for (game of miniGames; track game.id) {
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+          <app-mini-game-card [game]="game" [isSelectable]="true"></app-mini-game-card>
+        </div>
+      }
+    </div>
+  }
+</div>
