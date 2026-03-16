@@ -16,7 +16,7 @@
         <a class="nav-link" routerLink="patient-selector" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Patient Selector</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" routerLink="patient-profile" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Patient Profile</a>
+        <a class="nav-link" [class.disabled]="!isPatientSelected" routerLink="patient-profile" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [style.pointer-events]="isPatientSelected ? 'auto' : 'none'" [style.opacity]="isPatientSelected ? 1 : 0.5">Patient Profile</a>
       </li>
       <li class="nav-item">
         <button class="nav-link btn btn-link" (click)="logout()" style="color: #dc3545;">Logout</button>

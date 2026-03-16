@@ -24,3 +24,8 @@
         font-weight: bold;
     }
 }
+
+.nav-link.disabled {
+  cursor: not-allowed;
+  color: #6c757d !important;
+}

@@ -29,6 +29,7 @@ export class PatientCard {
     if (event) {
       event.stopPropagation();
     }
+    this.patientService.setSelectedPatient(this.patient);
     this.router.navigate(['/patient-profile']);
   }
 }

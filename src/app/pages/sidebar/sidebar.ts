@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { PatientService } from '../../services/patient.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -11,8 +12,13 @@ import { AuthService } from '../../services/auth.service';
 export class Sidebar {
   constructor(
     private authService: AuthService,
+    private patientService: PatientService,
     private router: Router
   ) {}
+
+  get isPatientSelected(): boolean {
+    return this.patientService.getSelectedPatient() !== null;
+  }
 
   /**
    * Handle logout
