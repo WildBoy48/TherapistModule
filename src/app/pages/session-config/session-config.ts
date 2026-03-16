@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { MiniGameCard } from '../../cards/mini-game-card/mini-game-card';
-import { PatientCard } from '../../cards/patient-card/patient-card';
 import { MiniGameService, MiniGame } from '../../services/mini-game.service';
 import { PatientService, Patient } from '../../services/patient.service';
 
 @Component({
   selector: 'app-session-config',
-  imports: [RouterLink, MiniGameCard, PatientCard],
+  imports: [RouterLink],
   templateUrl: './session-config.html',
   styleUrl: './session-config.css',
 })

@@ -1,34 +1,64 @@
-<div class="container">
-    <h2 class="mb-4">Session Configuration</h2>
-    
-    <!-- Patient Section -->
+<div class="container-fluid session-config px-0">
     <div class="row mb-3">
-        @if (selectedPatient) {
-            <div class="col">
-                <div class="patient-container">
-                    <app-patient-card [patient]="selectedPatient" [isSelectable]="false"></app-patient-card>
-                    <div class="patient-buttons">
-                        <button type="button" class="btn btn-primary mb-2" (click)="viewPatientProfile()">Profile</button>
-                        <button type="button" class="btn btn-warning" (click)="changePatient()">Change Patient</button>
-                    </div>
-                </div>
-            </div>
-        } @else {
-            <p class="col">No patient selected...</p>
-            <button type="button" class="btn btn-primary col" routerLink="/patient-selector">Patient List</button>
-        }
+        <div class="col-12">
+            <h2 class="mb-0">Session Configuration</h2>
+        </div>
     </div>
 
-    <!-- Mini-Game Section -->
-    <div class="row mb-3">
-        @if (selectedMiniGame) {
-            <div class="col mini-game-container">
-                <button type="button" class="btn btn-warning mb-3" (click)="changeMiniGame()">Change Mini-Game</button>
-                <app-mini-game-card [game]="selectedMiniGame"></app-mini-game-card>
+    <div class="row g-4 session-body">
+        <div class="col-12 col-lg-4 col-xl-3">
+            <div class="mini-game-column h-100">
+                <div class="mini-game-panel h-100">
+                    @if (selectedMiniGame) {
+                        <article class="selected-game-card">
+                            <img [src]="selectedMiniGame.image" [alt]="selectedMiniGame.name" class="selected-game-image">
+                            <div class="selected-game-content">
+                                <p class="game-id">Game #{{ selectedMiniGame.id }}</p>
+                                <h4>{{ selectedMiniGame.name }}</h4>
+                                <p class="target-group">{{ selectedMiniGame.targetGroup }}</p>
+                                <p class="description">{{ selectedMiniGame.description }}</p>
+                            </div>
+                        </article>
+                    } @else {
+                        <button type="button" class="empty-game-card" (click)="changeMiniGame()">
+                            <h4>No mini-game selected</h4>
+                            <p>Click here to choose the mini-game</p>
+                        </button>
+                    }
+                    @if (selectedMiniGame) {
+                            <button type="button" class="btn btn-warning" (click)="changeMiniGame()">Change</button>
+                        }
+                </div>
             </div>
-        } @else {
-            <p class="col">No mini-game selected...</p>
-            <button type="button" class="btn btn-primary col" routerLink="/mini-game-selector">Mini-Game List</button>
-        }
+        </div>
+
+        <div class="col-12 col-lg-8 col-xl-9">
+            <section class="session-content">
+                @if (selectedPatient) {
+                    <div class="row g-3 align-items-start">
+                        <div class="col-12 col-xl">
+                            <button type="button" class="selected-patient-card" (click)="viewPatientProfile()">
+                                <img [src]="selectedPatient.profileImage" [alt]="selectedPatient.name" class="selected-patient-image">
+                                <div class="selected-patient-content">
+                                    <h4 class="patient-name">{{ selectedPatient.name }}</h4>
+                                    <p class="patient-meta">{{ selectedPatient.gender }} - {{ selectedPatient.age }} years - {{ selectedPatient.handedness }}</p>
+                                    <p class="patient-diagnosis">{{ selectedPatient.diagnosis }}</p>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="col-12 col-xl-auto">
+                            <div class="patient-buttons">
+                                <button type="button" class="btn btn-warning" (click)="changePatient()">Change Patient</button>
+                            </div>
+                        </div>
+                    </div>
+                } @else {
+                    <div class="empty-patient-state">
+                        <p>No patient selected...</p>
+                        <button type="button" class="btn btn-primary" routerLink="/patient-selector">Patient List</button>
+                    </div>
+                }
+            </section>
+        </div>
     </div>
 </div>
