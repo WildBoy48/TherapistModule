@@ -20,7 +20,7 @@
   @if (!isLoading && !error) {
     <div class="row g-4">
       @for (game of miniGames; track game.id) {
-        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+        <div class="col-4 col-lg-3">
           <app-mini-game-card [game]="game" [isSelectable]="true"></app-mini-game-card>
         </div>
       }

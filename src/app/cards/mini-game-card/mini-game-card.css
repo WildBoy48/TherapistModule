@@ -1,8 +1,11 @@
 .card-wrapper {
-  display: inline-block;
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .card {
+  height: 100%;
   transition: box-shadow 0.3s ease;
 }
 

@@ -1,6 +1,6 @@
 @if (isSelectable) {
   <div class="card-wrapper selectable" (click)="selectGame()" style="cursor: pointer;">
-    <div class="card" style="width: 18rem;">
+    <div class="card">
       <img [src]="game.image" class="card-img-top" [alt]="game.name">
       <div class="card-body">
         <h5 class="card-title">{{ game.name }}</h5>
@@ -11,7 +11,7 @@
   </div>
 } @else {
   <div class="card-wrapper">
-    <div class="card" style="width: 18rem;">
+    <div class="card">
       <img [src]="game.image" class="card-img-top" [alt]="game.name">
       <div class="card-body">
         <h5 class="card-title">{{ game.name }}</h5>

@@ -1,6 +1,6 @@
 @if (isSelectable) {
   <div class="card-wrapper selectable" (click)="selectPatient()" style="cursor: pointer;">
-    <div class="card" style="width: 18rem;">
+    <div class="card">
       <img [src]="patient.profileImage" class="card-img-top" [alt]="patient.name">
       <div class="card-body">
         <h5 class="card-title">{{ patient.name }}</h5>
