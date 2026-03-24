@@ -13,6 +13,13 @@
         align-items: flex-start;
     }
 
+    .navbar-collapse {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
     .navbar-nav {
         flex-direction: column;
         width: 100%;
@@ -28,4 +35,11 @@
 .nav-link.disabled {
   cursor: not-allowed;
   color: #6c757d !important;
+}
+
+.logout-btn {
+  margin-top: auto;
+  padding: 0.5rem 1rem;
+  color: #dc3545;
+  text-decoration: none;
 }

@@ -58,7 +58,50 @@
                         <button type="button" class="btn btn-primary" routerLink="/patient-selector">Patient List</button>
                     </div>
                 }
+
+                <div class="card mt-3">
+                    <div class="card-header d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                        <h5 class="mb-0">Task Parameters</h5>
+                        <div class="d-flex gap-2 ms-auto">
+                            <button type="button" class="btn btn-outline-secondary">Load Defautl Parameters</button>
+                            <button type="button" class="btn btn-primary">Save as New Default</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label for="taskTime" class="form-label">Time</label>
+                                <input id="taskTime" type="number" min="0" class="form-control" placeholder="Enter time (seconds)">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="taskScore" class="form-label">Score</label>
+                                <input id="taskScore" type="number" min="0" class="form-control" placeholder="Enter target score">
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="audioCues">
+                                    <label class="form-check-label" for="audioCues">Audio Cues</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="visualCues">
+                                    <label class="form-check-label" for="visualCues">Visual Cues</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="hapticFeedback">
+                                    <label class="form-check-label" for="hapticFeedback">Haptic Feedback</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
+            <div class="d-flex justify-content-center mt-4">
+                <button type="button" class="btn btn-success btn-lg" [disabled]="!selectedMiniGame || !selectedPatient" routerLink="/therapy-session">Begin Session</button>
+            </div>
         </div>
     </div>
 </div>
