@@ -24,8 +24,8 @@
 
 .edit-btn {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: 0rem;
+    right: 0rem;
     padding: 0.5rem 1rem;
     background-color: #007bff;
     color: white;
@@ -38,6 +38,60 @@
 
 .edit-btn:hover {
     background-color: #0056b3;
+}
+
+.edit-actions {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+}
+
+.cancel-btn {
+    padding: 0.5rem 1rem;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.cancel-btn:hover {
+    background-color: #545b62;
+}
+
+.save-btn {
+    padding: 0.5rem 1rem;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.save-btn:hover {
+    background-color: #1e7e34;
+}
+
+.edit-input {
+    flex: 1;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    max-width:  12rem;
+    font-size: 0.95rem;
+    color: #333;
+    text-align: right;
+}
+
+.edit-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
 }
 
 .card-content {
@@ -134,6 +188,23 @@
     text-align: center;
     margin: 1rem 0;
     font-style: italic;
+}
+
+.goals-edit-input {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0.5rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+    resize: vertical;
+    color: #333;
+}
+
+.goals-edit-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
 }
 
 .therapist-notes-card {

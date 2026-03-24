@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
 import { PatientService, Patient } from '../../services/patient.service';
 
@@ -12,12 +13,16 @@ interface TherapySession {
 
 @Component({
   selector: 'app-patient-profile',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './patient-profile.html',
   styleUrl: './patient-profile.css',
 })
 export class PatientProfile implements OnInit {
   patient: Patient | null = null;
+  isEditing = false;
+  editForm: Partial<Patient> = {};
+  isEditingGoals = false;
+  goalsForm = '';
   recentSessions: TherapySession[] = [
     { id: 's1', title: 'Upper Limb Mobility', date: 'Mar 15, 2026', duration: '35 min' },
     { id: 's2', title: 'Grip Strength Training', date: 'Mar 12, 2026', duration: '30 min' },
@@ -27,7 +32,8 @@ export class PatientProfile implements OnInit {
 
   constructor(
     private patientService: PatientService,
-    private location: Location
+    private location: Location,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -43,16 +49,48 @@ export class PatientProfile implements OnInit {
 
   editPatient(): void {
     if (this.patient) {
-      // TODO: Implement edit functionality
-      console.log('Edit patient:', this.patient);
+      this.editForm = { ...this.patient };
+      this.isEditing = true;
     }
+  }
+
+  cancelEdit(): void {
+    this.isEditing = false;
+    this.editForm = {};
+  }
+
+  async savePatient(): Promise<void> {
+    if (!this.patient) return;
+    const updated: Patient = { ...this.patient, ...this.editForm };
+    await this.patientService.updatePatient(updated);
+    this.patient = updated;
+    this.patientService.setSelectedPatient(updated);
+    this.isEditing = false;
+    this.editForm = {};
+    this.cdr.markForCheck();
   }
 
   editGoals(): void {
     if (this.patient) {
-      // TODO: Implement edit goals functionality
-      console.log('Edit goals for patient:', this.patient);
+      this.goalsForm = this.patient.rehabilitationGoals ?? '';
+      this.isEditingGoals = true;
     }
+  }
+
+  cancelEditGoals(): void {
+    this.isEditingGoals = false;
+    this.goalsForm = '';
+  }
+
+  async saveGoals(): Promise<void> {
+    if (!this.patient) return;
+    const updated: Patient = { ...this.patient, rehabilitationGoals: this.goalsForm };
+    await this.patientService.updatePatient(updated);
+    this.patient = updated;
+    this.patientService.setSelectedPatient(updated);
+    this.isEditingGoals = false;
+    this.goalsForm = '';
+    this.cdr.markForCheck();
   }
 
   seeAllSessions(): void {
