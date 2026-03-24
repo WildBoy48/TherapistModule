@@ -49,6 +49,17 @@
     z-index: 10;
 }
 
+.form-error {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: #b42318;
+    background-color: #fef3f2;
+    border: 1px solid #fecdca;
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+}
+
 .cancel-btn {
     padding: 0.5rem 1rem;
     background-color: #6c757d;

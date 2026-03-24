@@ -12,9 +12,11 @@
                 </ng-container>
                 <ng-container *ngIf="isEditing">
                     <button class="cancel-btn" (click)="cancelEdit()">Cancel</button>
-                    <button class="save-btn" (click)="savePatient()">Save</button>
+                    <button class="save-btn" (click)="savePatient()">{{ isCreatingProfile ? 'Create' : 'Save' }}</button>
                 </ng-container>
             </div>
+
+            <div class="form-error" *ngIf="formError">{{ formError }}</div>
 
             <!-- View mode -->
             <div class="card-content" *ngIf="patient && !isEditing">
@@ -61,6 +63,7 @@
                     <div class="info-item">
                         <span class="label">Gender:</span>
                         <select class="edit-input" [(ngModel)]="editForm.gender">
+                            <option value="" disabled>Select gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                             <option value="Other">Other</option>
@@ -69,6 +72,7 @@
                     <div class="info-item">
                         <span class="label">Handedness:</span>
                         <select class="edit-input" [(ngModel)]="editForm.handedness">
+                            <option value="" disabled>Select handedness</option>
                             <option value="Right">Right-Handed</option>
                             <option value="Left">Left-Handed</option>
                             <option value="Ambidextrous">Ambidextrous</option>
@@ -85,7 +89,7 @@
                 <p>No patient selected</p>
             </div>
         </div>
-        <div class="card goals-card mt-3" *ngIf="patient">
+        <div class="card goals-card mt-3" *ngIf="patient && !isCreatingProfile">
             <div class="edit-actions">
                 <ng-container *ngIf="!isEditingGoals">
                     <button class="edit-btn" (click)="editGoals()">Edit</button>
@@ -117,7 +121,7 @@
         </div> -->
     </div>
 
-    <div class="col-6 col-lg-7 pe-0" *ngIf="patient">
+    <div class="col-6 col-lg-7 pe-0" *ngIf="patient && !isCreatingProfile">
         <div class="card session-history-card">
             <div class="session-history-header">
                 <h5 class="mb-0">Session History</h5>

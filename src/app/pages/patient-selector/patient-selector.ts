@@ -2,6 +2,7 @@ import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { PatientCard } from '../../cards/patient-card/patient-card';
 import { PatientService, Patient } from '../../services/patient.service';
 import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-patient-selector',
@@ -19,7 +20,8 @@ export class PatientSelector implements OnInit {
     private patientService: PatientService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -45,6 +47,10 @@ export class PatientSelector implements OnInit {
 
   clearSearch(): void {
     this.searchTerm = '';
+  }
+
+  addPatient(): void {
+    this.router.navigate(['/patient-profile'], { state: { createNew: true } });
   }
 
   private normalizeText(value: string): string {

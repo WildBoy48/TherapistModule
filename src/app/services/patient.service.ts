@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import { Firestore, collection, getDocs, query, where, doc, updateDoc } from '@angular/fire/firestore';
+import { Firestore, collection, getDocs, query, where, doc, updateDoc, setDoc } from '@angular/fire/firestore';
 
 export interface Patient {
   id: string;
@@ -73,5 +73,19 @@ export class PatientService {
     const patientRef = doc(this.firestore, this.patientsCollection, patient.id);
     const { id, ...updateData } = patient;
     await updateDoc(patientRef, updateData as { [key: string]: unknown });
+  }
+
+  /**
+   * Create a new patient profile in the database
+   */
+  async createPatient(patientData: Omit<Patient, 'id'>): Promise<Patient> {
+    const patientRef = doc(collection(this.firestore, this.patientsCollection));
+    const newPatient: Patient = {
+      id: patientRef.id,
+      ...patientData,
+    };
+
+    await setDoc(patientRef, newPatient);
+    return newPatient;
   }
 }

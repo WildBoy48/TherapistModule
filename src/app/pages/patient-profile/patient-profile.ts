@@ -2,7 +2,9 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 import { PatientService, Patient } from '../../services/patient.service';
+import { AuthService } from '../../services/auth.service';
 
 interface TherapySession {
   id: string;
@@ -18,9 +20,13 @@ interface TherapySession {
   styleUrl: './patient-profile.css',
 })
 export class PatientProfile implements OnInit {
+  private readonly defaultProfileImage = '/imgs/profile.jpg';
+
   patient: Patient | null = null;
   isEditing = false;
   editForm: Partial<Patient> = {};
+  isCreatingProfile = false;
+  formError: string | null = null;
   isEditingGoals = false;
   goalsForm = '';
   recentSessions: TherapySession[] = [
@@ -33,12 +39,19 @@ export class PatientProfile implements OnInit {
   constructor(
     private patientService: PatientService,
     private location: Location,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     // First, check if a patient was passed via navigation state
-    const state = this.location.getState() as { patient?: Patient };
+    const state = this.location.getState() as { patient?: Patient; createNew?: boolean };
+    if (state?.createNew) {
+      this.initializeNewPatientForm();
+      return;
+    }
+
     if (state && state.patient) {
       this.patient = state.patient;
     } else {
@@ -47,27 +60,120 @@ export class PatientProfile implements OnInit {
     }
   }
 
+  private initializeNewPatientForm(): void {
+    this.isCreatingProfile = true;
+    this.isEditing = true;
+    this.formError = null;
+    this.patient = {
+      id: '',
+      name: '',
+      gender: '',
+      age: 0,
+      handedness: '',
+      diagnosis: '',
+      profileImage: this.defaultProfileImage,
+      therapistId: '',
+      rehabilitationGoals: '',
+    };
+    this.editForm = {
+      name: '',
+      gender: '',
+      age: undefined,
+      handedness: '',
+      diagnosis: '',
+    };
+  }
+
   editPatient(): void {
     if (this.patient) {
+      this.formError = null;
       this.editForm = { ...this.patient };
       this.isEditing = true;
     }
   }
 
   cancelEdit(): void {
+    if (this.isCreatingProfile) {
+      this.patient = null;
+      this.editForm = {};
+      this.formError = null;
+      this.isCreatingProfile = false;
+      this.isEditing = false;
+      this.router.navigate(['/patient-selector']);
+      return;
+    }
+
     this.isEditing = false;
     this.editForm = {};
+    this.formError = null;
   }
 
   async savePatient(): Promise<void> {
     if (!this.patient) return;
-    const updated: Patient = { ...this.patient, ...this.editForm };
+
+    const mergedPatient: Patient = { ...this.patient, ...this.editForm };
+
+    if (!this.isPatientFormValid(mergedPatient)) {
+      this.formError = 'Please fill in all patient fields before saving.';
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.formError = null;
+
+    if (this.isCreatingProfile) {
+      const currentUser = this.authService.getCurrentUser();
+
+      if (!currentUser) {
+        this.formError = 'User not authenticated. Please login again.';
+        this.cdr.markForCheck();
+        return;
+      }
+
+      const created = await this.patientService.createPatient({
+        name: (mergedPatient.name ?? '').trim(),
+        gender: mergedPatient.gender,
+        age: Number(mergedPatient.age),
+        handedness: mergedPatient.handedness,
+        diagnosis: (mergedPatient.diagnosis ?? '').trim(),
+        profileImage: this.patient.profileImage || this.defaultProfileImage,
+        therapistId: currentUser.uid,
+        rehabilitationGoals: (mergedPatient.rehabilitationGoals ?? '').trim(),
+      });
+
+      this.patient = created;
+      this.patientService.setSelectedPatient(created);
+      this.isCreatingProfile = false;
+      this.isEditing = false;
+      this.editForm = {};
+      this.cdr.markForCheck();
+      return;
+    }
+
+    const updated: Patient = {
+      ...mergedPatient,
+      name: (mergedPatient.name ?? '').trim(),
+      diagnosis: (mergedPatient.diagnosis ?? '').trim(),
+      age: Number(mergedPatient.age),
+    };
+
     await this.patientService.updatePatient(updated);
     this.patient = updated;
     this.patientService.setSelectedPatient(updated);
     this.isEditing = false;
     this.editForm = {};
     this.cdr.markForCheck();
+  }
+
+  private isPatientFormValid(patient: Patient): boolean {
+    return Boolean(
+      patient.name?.trim() &&
+        Number.isFinite(Number(patient.age)) &&
+        Number(patient.age) >= 0 &&
+        patient.gender?.trim() &&
+        patient.handedness?.trim() &&
+        patient.diagnosis?.trim()
+    );
   }
 
   editGoals(): void {
