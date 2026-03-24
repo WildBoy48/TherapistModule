@@ -14,3 +14,9 @@
 .patients-container {
   padding: 20px;
 }
+
+.empty-state {
+  text-align: center;
+  color: #6c757d;
+  margin-bottom: 16px;
+}

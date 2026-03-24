@@ -21,8 +21,28 @@
   }
 
   @if (!isLoading && !error && patients.length > 0) {
+    <div class="row mb-3">
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="input-group">
+          <input
+            type="search"
+            class="form-control"
+            placeholder="Search patients by name"
+            [value]="searchTerm"
+            (input)="onSearchInput($event)"
+          />
+        </div>
+      </div>
+    </div>
+
+    @if (filteredPatients.length === 0) {
+      <div class="empty-state">
+        <p>No patients match "{{ searchTerm }}".</p>
+      </div>
+    }
+
     <div class="row g-4">
-      @for (patient of patients; track patient.id) {
+      @for (patient of filteredPatients; track patient.id) {
         <div class="col-4 col-lg-3">
           <app-patient-card [patient]="patient" [isSelectable]="true"></app-patient-card>
         </div>

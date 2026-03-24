@@ -11,6 +11,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class PatientSelector implements OnInit {
   patients: Patient[] = [];
+  searchTerm = '';
   isLoading = true;
   error: string | null = null;
 
@@ -23,6 +24,35 @@ export class PatientSelector implements OnInit {
 
   ngOnInit(): void {
     this.loadPatients();
+  }
+
+  get filteredPatients(): Patient[] {
+    const term = this.normalizeText(this.searchTerm);
+
+    if (!term) {
+      return this.patients;
+    }
+
+    return this.patients.filter((patient) =>
+      this.normalizeText(patient.name).includes(term)
+    );
+  }
+
+  onSearchInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.searchTerm = input.value;
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+  }
+
+  private normalizeText(value: string): string {
+    return value
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
   }
 
   private loadPatients(): void {
