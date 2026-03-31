@@ -1,7 +1,7 @@
 @if (isSelectable) {
   <div class="card-wrapper selectable" (click)="selectPatient()" style="cursor: pointer;">
     <div class="card">
-      <img [src]="patient.profileImage" class="card-img-top" [alt]="patient.name">
+      <img [src]="imgSrc" class="card-img-top" [alt]="patient.name" (error)="onImageError()">
       <div class="card-body">
         <h5 class="card-title">{{ patient.name }}</h5>
         <h6 class="card-subtitle mb-2 text-body-secondary">{{ patient.gender }} - {{ patient.age }} anos - {{ patient.handedness }}-Handed</h6>
@@ -13,7 +13,7 @@
 } @else {
   <div class="card-wrapper">
     <div class="card">
-      <img [src]="patient.profileImage" class="card-img-top" [alt]="patient.name">
+      <img [src]="imgSrc" class="card-img-top" [alt]="patient.name" (error)="onImageError()">
       <div class="card-body">
         <h5 class="card-title">{{ patient.name }}</h5>
         <h6 class="card-subtitle mb-2 text-body-secondary">{{ patient.gender }} - {{ patient.age }} anos - {{ patient.handedness }}-Handed</h6>

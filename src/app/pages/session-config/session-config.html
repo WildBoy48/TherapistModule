@@ -10,6 +10,9 @@
             <div class="mini-game-column h-100">
                 <div class="mini-game-panel h-100">
                     @if (selectedMiniGame) {
+                            <button type="button" class="btn btn-warning" (click)="changeMiniGame()">Change</button>
+                    }
+                    @if (selectedMiniGame) {
                         <article class="selected-game-card">
                             <img [src]="selectedMiniGame.image" [alt]="selectedMiniGame.name" class="selected-game-image">
                             <div class="selected-game-content">
@@ -25,9 +28,6 @@
                             <p>Click here to choose the mini-game</p>
                         </button>
                     }
-                    @if (selectedMiniGame) {
-                            <button type="button" class="btn btn-warning" (click)="changeMiniGame()">Change</button>
-                        }
                 </div>
             </div>
         </div>
@@ -46,7 +46,7 @@
                                 </div>
                             </button>
                         </div>
-                        <div class="col-12 col-xl-auto">
+                        <div class="col-12 col-xl-auto pt-1">
                             <div class="patient-buttons">
                                 <button type="button" class="btn btn-warning" (click)="changePatient()">Change Patient</button>
                             </div>

@@ -3,8 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { PatientService, Patient } from '../../services/patient.service';
 import { AuthService } from '../../services/auth.service';
+
+const LOCAL_SERVER = 'http://localhost:3000';
 
 interface TherapySession {
   id: string;
@@ -23,12 +27,15 @@ export class PatientProfile implements OnInit {
   private readonly defaultProfileImage = '/imgs/profile.jpg';
 
   patient: Patient | null = null;
+  profileImageSrc: string = this.defaultProfileImage;
   isEditing = false;
   editForm: Partial<Patient> = {};
   isCreatingProfile = false;
   formError: string | null = null;
   isEditingGoals = false;
   goalsForm = '';
+  selectedFile: File | null = null;
+  imagePreviewUrl: string | null = null;
   recentSessions: TherapySession[] = [
     { id: 's1', title: 'Upper Limb Mobility', date: 'Mar 15, 2026', duration: '35 min' },
     { id: 's2', title: 'Grip Strength Training', date: 'Mar 12, 2026', duration: '30 min' },
@@ -41,7 +48,8 @@ export class PatientProfile implements OnInit {
     private location: Location,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -58,6 +66,11 @@ export class PatientProfile implements OnInit {
       // Otherwise, use the selected patient from the service
       this.patient = this.patientService.getSelectedPatient();
     }
+    this.syncProfileImageSrc();
+  }
+
+  private syncProfileImageSrc(): void {
+    this.profileImageSrc = this.patient?.profileImage || this.defaultProfileImage;
   }
 
   private initializeNewPatientForm(): void {
@@ -75,6 +88,7 @@ export class PatientProfile implements OnInit {
       therapistId: '',
       rehabilitationGoals: '',
     };
+    this.syncProfileImageSrc();
     this.editForm = {
       name: '',
       gender: '',
@@ -84,15 +98,50 @@ export class PatientProfile implements OnInit {
     };
   }
 
+  onImageError(_event: Event): void {
+    this.profileImageSrc = this.defaultProfileImage;
+    this.cdr.markForCheck();
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    this.selectedFile = file;
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreviewUrl = reader.result as string;
+        this.cdr.markForCheck();
+      };
+      reader.readAsDataURL(file);
+    } else {
+      this.imagePreviewUrl = null;
+    }
+  }
+
+  private async uploadSelectedFile(): Promise<string | null> {
+    if (!this.selectedFile) return null;
+    const formData = new FormData();
+    formData.append('image', this.selectedFile);
+    const res = await firstValueFrom(
+      this.http.post<{ url: string }>(`${LOCAL_SERVER}/upload-profile-picture`, formData)
+    );
+    return res.url;
+  }
+
   editPatient(): void {
     if (this.patient) {
       this.formError = null;
       this.editForm = { ...this.patient };
+      this.selectedFile = null;
+      this.imagePreviewUrl = null;
       this.isEditing = true;
     }
   }
 
   cancelEdit(): void {
+    this.selectedFile = null;
+    this.imagePreviewUrl = null;
     if (this.isCreatingProfile) {
       this.patient = null;
       this.editForm = {};
@@ -121,6 +170,18 @@ export class PatientProfile implements OnInit {
 
     this.formError = null;
 
+    // Upload a new profile picture if the user selected one
+    let uploadedImageUrl: string | null = null;
+    if (this.selectedFile) {
+      try {
+        uploadedImageUrl = await this.uploadSelectedFile();
+      } catch {
+        this.formError = 'Failed to upload profile picture. Make sure the local server is running.';
+        this.cdr.markForCheck();
+        return;
+      }
+    }
+
     if (this.isCreatingProfile) {
       const currentUser = this.authService.getCurrentUser();
 
@@ -136,12 +197,13 @@ export class PatientProfile implements OnInit {
         age: Number(mergedPatient.age),
         handedness: mergedPatient.handedness,
         diagnosis: (mergedPatient.diagnosis ?? '').trim(),
-        profileImage: this.patient.profileImage || this.defaultProfileImage,
+        profileImage: uploadedImageUrl ?? this.patient.profileImage ?? this.defaultProfileImage,
         therapistId: currentUser.uid,
         rehabilitationGoals: (mergedPatient.rehabilitationGoals ?? '').trim(),
       });
 
       this.patient = created;
+      this.syncProfileImageSrc();
       this.patientService.setSelectedPatient(created);
       this.isCreatingProfile = false;
       this.isEditing = false;
@@ -155,11 +217,15 @@ export class PatientProfile implements OnInit {
       name: (mergedPatient.name ?? '').trim(),
       diagnosis: (mergedPatient.diagnosis ?? '').trim(),
       age: Number(mergedPatient.age),
+      profileImage: uploadedImageUrl ?? mergedPatient.profileImage,
     };
 
     await this.patientService.updatePatient(updated);
     this.patient = updated;
+    this.syncProfileImageSrc();
     this.patientService.setSelectedPatient(updated);
+    this.selectedFile = null;
+    this.imagePreviewUrl = null;
     this.isEditing = false;
     this.editForm = {};
     this.cdr.markForCheck();
