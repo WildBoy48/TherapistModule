@@ -38,7 +38,7 @@
                     <div class="row g-3 align-items-start">
                         <div class="col-12 col-xl">
                             <button type="button" class="selected-patient-card" (click)="viewPatientProfile()">
-                                <img [src]="selectedPatient.profileImage" [alt]="selectedPatient.name" class="selected-patient-image">
+                                <img [src]="patientImgSrc" [alt]="selectedPatient.name" class="selected-patient-image" (error)="onPatientImageError()">
                                 <div class="selected-patient-content">
                                     <h4 class="patient-name">{{ selectedPatient.name }}</h4>
                                     <p class="patient-meta">{{ selectedPatient.gender }} - {{ selectedPatient.age }} years - {{ selectedPatient.handedness }}-Handed</p>
@@ -100,8 +100,38 @@
                 </div>
             </section>
             <div class="d-flex justify-content-center mt-4">
-                <button type="button" class="btn btn-success btn-lg" [disabled]="!selectedMiniGame || !selectedPatient" routerLink="/therapy-session">Begin Session</button>
+                <button type="button" class="btn btn-success btn-lg" [disabled]="!selectedMiniGame || !selectedPatient" (click)="beginSession()">Begin Session</button>
             </div>
         </div>
     </div>
 </div>
+
+@if (showSessionDialog) {
+    <div class="session-overlay" (click)="$event.target === $event.currentTarget && cancelSession()">
+        <div class="session-dialog">
+            <div class="session-dialog-header">
+                <h5 class="mb-0">Starting Session</h5>
+            </div>
+            <div class="session-dialog-body">
+                <ul class="session-log-list">
+                    @for (entry of sessionLogs; track $index) {
+                        <li class="session-log-entry" [ngClass]="entry.status">
+                            <span class="log-icon">
+                                @if (entry.status === 'pending') { <span class="spinner-border spinner-border-sm"></span> }
+                                @if (entry.status === 'success') { ✔ }
+                                @if (entry.status === 'error') { ✖ }
+                            </span>
+                            <span class="log-message">{{ entry.message }}</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="session-dialog-footer">
+                @if (sessionReady) {
+                    <button type="button" class="btn btn-success" (click)="proceedToSession()">Proceed to Session</button>
+                }
+                <button type="button" class="btn btn-danger" (click)="cancelSession()">Cancel Session</button>
+            </div>
+        </div>
+    </div>
+}
