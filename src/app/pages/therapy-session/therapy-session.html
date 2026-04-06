@@ -1,1 +1,138 @@
-<p>therapy-session works!</p>
+<div class="session-container">
+
+  <!-- ── Header ── -->
+  <div class="session-header">
+    <div class="header-left">
+      <h2>Therapy Session</h2>
+      <div class="connection-status" [class.active]="connected">
+        <span class="status-dot"></span>
+        {{ connected ? 'Game connected' : 'Waiting for game...' }}
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-pause" [class.is-paused]="paused" (click)="togglePause()">
+        {{ paused ? '&#9654; Resume' : '&#9208; Pause' }}
+      </button>
+      <button class="btn-end-session" (click)="endSession()">⏹ End Session</button>
+    </div>
+  </div>
+
+  <!-- ── Three-column layout ── -->
+  <div class="session-columns">
+
+    <!-- Left: Task Parameters -->
+    <div class="col col-left">
+      <div class="panel">
+        <h3 class="panel-title">Task Parameters</h3>
+        <p class="panel-placeholder">Parameter configuration coming soon.</p>
+      </div>
+    </div>
+
+    <!-- Middle: Graph + Session Log -->
+    <div class="col col-middle">
+      <ng-container *ngIf="currentStats; else noStats">
+        <div class="graph-card panel">
+          <div class="graph-header">
+            <span class="panel-title">Score over Time</span>
+            <span class="graph-current-score">{{ currentStats.score }}</span>
+          </div>
+          <svg class="score-graph"
+               [attr.viewBox]="'0 0 ' + GRAPH_W + ' ' + GRAPH_H"
+               preserveAspectRatio="none">
+            <polyline
+              *ngIf="svgPolylinePoints"
+              [attr.points]="svgPolylinePoints"
+              fill="none"
+              stroke="#3949ab"
+              stroke-width="2"
+              stroke-linejoin="round"
+              stroke-linecap="round" />
+          </svg>
+        </div>
+
+        <div class="task-log-card panel">
+          <h3 class="panel-title">Session Log</h3>
+          <div class="task-log-scroll" #taskLogEl>
+            <div *ngFor="let entry of taskLog" class="task-log-entry">
+              <span class="log-time">{{ entry.timestamp }}</span>
+              <span class="log-task">{{ entry.task }}</span>
+            </div>
+            <div *ngIf="taskLog.length === 0" class="log-empty">No tasks recorded yet.</div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #noStats>
+        <p class="no-data">No session data yet. Start the game to see live stats.</p>
+      </ng-template>
+    </div>
+
+    <!-- Right: Performance + Side Notes -->
+    <div class="col col-right">
+      <div class="panel performance-panel">
+        <h3 class="panel-title">Performance</h3>
+        <ng-container *ngIf="currentStats; else noPerf">
+          <div class="perf-stat">
+            <span class="perf-label">Score</span>
+            <span class="perf-value">{{ currentStats.score }}</span>
+          </div>
+          <div class="perf-stat">
+            <span class="perf-label">Time Elapsed</span>
+            <span class="perf-value">{{ formatTime(currentStats.timeElapsed) }}</span>
+          </div>
+          <div class="perf-stat">
+            <span class="perf-label">Errors</span>
+            <span class="perf-value perf-error">{{ currentStats.errors }}</span>
+          </div>
+          <div class="perf-stat">
+            <span class="perf-label">Status</span>
+            <span class="perf-value perf-status">{{ currentStats.completed ? 'Completed' : 'In Progress' }}</span>
+          </div>
+        </ng-container>
+        <ng-template #noPerf>
+          <p class="no-data">Waiting for session data...</p>
+        </ng-template>
+      </div>
+
+      <div class="panel side-notes-panel">
+        <h3 class="panel-title">Side Notes</h3>
+        <textarea class="side-notes-area" placeholder="Write session notes here..."></textarea>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Session Summary Modal ── -->
+<div *ngIf="showSummary" class="modal-backdrop">
+  <div class="modal-box">
+    <h2 class="modal-title">Session Summary</h2>
+
+    <div *ngIf="sessionSummary" class="summary-grid">
+      <div class="summary-row">
+        <span class="summary-label">Status</span>
+        <span class="summary-value">{{ sessionSummary.status }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Final Score</span>
+        <span class="summary-value summary-score">{{ sessionSummary.finalScore }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Total Time</span>
+        <span class="summary-value">{{ sessionSummary.totalTime }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Errors</span>
+        <span class="summary-value summary-error">{{ sessionSummary.errors }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Tasks Logged</span>
+        <span class="summary-value">{{ sessionSummary.tasksCompleted }}</span>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-go-back" (click)="goBack()">&#8592; Go Back to Session Config</button>
+    </div>
+  </div>
+</div>

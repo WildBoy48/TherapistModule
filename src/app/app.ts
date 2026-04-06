@@ -24,7 +24,9 @@ export class App implements OnInit, OnDestroy {
   
   // Check if sidebar should be visible
   shouldShowSidebar: Signal<boolean> = computed(() => 
-    this.isLoggedIn() && this.currentRoute() !== '/login'
+    this.isLoggedIn() &&
+    this.currentRoute() !== '/login' &&
+    this.currentRoute() !== '/therapy-session'
   );
 
   constructor(

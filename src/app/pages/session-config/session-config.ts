@@ -1,9 +1,11 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { NgClass } from '@angular/common';
+import { Subscription } from 'rxjs';
 import { MiniGameService, MiniGame } from '../../services/mini-game.service';
 import { PatientService, Patient } from '../../services/patient.service';
+import { GameStatsService } from '../../services/game-stats.service';
 
 const SERVER_URL = 'http://localhost:3000';
 const DEFAULT_PROFILE_IMAGE = '/imgs/profile.jpg';
@@ -21,7 +23,7 @@ export interface LogEntry {
   templateUrl: './session-config.html',
   styleUrl: './session-config.css',
 })
-export class SessionConfig implements OnInit {
+export class SessionConfig implements OnInit, OnDestroy {
   selectedMiniGame: MiniGame | null = null;
   selectedPatient: Patient | null = null;
   patientImgSrc: string = DEFAULT_PROFILE_IMAGE;
@@ -30,12 +32,15 @@ export class SessionConfig implements OnInit {
   sessionLogs: LogEntry[] = [];
   sessionReady = false;
 
+  private _connectionSub: Subscription | null = null;
+
   constructor(
     private miniGameService: MiniGameService,
     private patientService: PatientService,
     private router: Router,
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private gameStats: GameStatsService
   ) {}
 
   ngOnInit(): void {
@@ -76,18 +81,18 @@ export class SessionConfig implements OnInit {
     this.http.get(`${SERVER_URL}/status`).subscribe({
       next: () => {
         this.setLog(0, 'Connected to local server.', 'success');
-        this.sessionLogs = [...this.sessionLogs, { message: 'Starting game...', status: 'pending' }];
+        this.sessionLogs = [...this.sessionLogs, { message: 'Waiting for Unity game...', status: 'pending' }];
         this.cdr.detectChanges();
 
-        this.http.post(`${SERVER_URL}/start-game`, {}).subscribe({
-          next: (res: any) => {
-            this.setLog(1, res?.message ?? 'Game started successfully.', 'success');
+        this.gameStats.connect();
+        this._connectionSub = this.gameStats.connected$.subscribe(connected => {
+          if (connected) {
+            this.setLog(1, 'Unity game connected.', 'success');
             this.sessionReady = true;
             this.cdr.detectChanges();
-          },
-          error: (err) => {
-            this.setLog(1, err?.error?.message ?? 'Failed to start game.', 'error');
-          },
+            this._connectionSub?.unsubscribe();
+            this._connectionSub = null;
+          }
         });
       },
       error: () => {
@@ -97,10 +102,16 @@ export class SessionConfig implements OnInit {
   }
 
   cancelSession(): void {
-    this.http.post(`${SERVER_URL}/stop-game`, {}).subscribe({ error: () => {} });
+    this._connectionSub?.unsubscribe();
+    this._connectionSub = null;
+    this.gameStats.disconnect();
     this.showSessionDialog = false;
     this.sessionLogs = [];
     this.sessionReady = false;
+  }
+
+  ngOnDestroy(): void {
+    this._connectionSub?.unsubscribe();
   }
 
   proceedToSession(): void {
