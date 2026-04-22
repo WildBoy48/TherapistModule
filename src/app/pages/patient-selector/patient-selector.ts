@@ -15,6 +15,8 @@ export class PatientSelector implements OnInit {
   searchTerm = '';
   isLoading = true;
   error: string | null = null;
+  isExportMode = false;
+  selectedPatients: Set<string> = new Set();
 
   constructor(
     private patientService: PatientService,
@@ -53,6 +55,106 @@ export class PatientSelector implements OnInit {
     this.router.navigate(['/patient-profile'], { state: { createNew: true } });
   }
 
+  toggleExportMode(): void {
+    this.isExportMode = !this.isExportMode;
+    if (!this.isExportMode) {
+      this.selectedPatients.clear();
+    }
+  }
+
+  togglePatientSelection(patientId: string): void {
+    if (this.selectedPatients.has(patientId)) {
+      this.selectedPatients.delete(patientId);
+    } else {
+      this.selectedPatients.add(patientId);
+    }
+  }
+
+  exportSelected(): void {
+    if (this.selectedPatients.size === 0) {
+      alert('Please select at least one patient to export.');
+      return;
+    }
+
+    const selectedData = this.patients
+      .filter(p => this.selectedPatients.has(p.id))
+      .map(p => {
+        // Exclude profileImage as it's server-specific and not portable
+        const { profileImage, id, therapistId, ...exportData } = p;
+        return exportData;
+      });
+    const json = JSON.stringify(selectedData, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'patients_export.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    this.isExportMode = false;
+    this.selectedPatients.clear();
+  }
+
+  importPatients(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const json = JSON.parse(e.target?.result as string);
+        if (!Array.isArray(json)) {
+          throw new Error('JSON must be an array of patients.');
+        }
+
+        const currentUser = this.authService.getCurrentUser();
+        if (!currentUser) {
+          throw new Error('User not authenticated.');
+        }
+
+        for (const patientData of json) {
+          if (!this.isValidPatientData(patientData)) {
+            throw new Error('Invalid patient data structure.');
+          }
+
+          const newPatient: Omit<Patient, 'id'> = {
+            name: patientData.name,
+            gender: patientData.gender,
+            age: patientData.age,
+            handedness: patientData.handedness,
+            diagnosis: patientData.diagnosis,
+            profileImage: '/imgs/profile.jpg', // Set default image for imported patients
+            therapistId: currentUser.uid,
+            rehabilitationGoals: patientData.rehabilitationGoals,
+          };
+
+          await this.patientService.createPatient(newPatient);
+        }
+
+        // Reload patients
+        await this.loadPatients();
+        alert('Patients imported successfully. You can update profile images manually in the patient profiles.');
+      } catch (error) {
+        console.error('Import error:', error);
+        alert('Failed to import patients: ' + (error as Error).message);
+      }
+    };
+    reader.readAsText(file);
+    input.value = ''; // Reset input
+  }
+
+  private isValidPatientData(data: any): boolean {
+    return (
+      typeof data.name === 'string' &&
+      typeof data.gender === 'string' &&
+      typeof data.age === 'number' &&
+      typeof data.handedness === 'string' &&
+      typeof data.diagnosis === 'string' &&
+      (data.rehabilitationGoals === undefined || typeof data.rehabilitationGoals === 'string')
+    );
+  }
+
   private normalizeText(value: string): string {
     return value
       .trim()
@@ -61,7 +163,7 @@ export class PatientSelector implements OnInit {
       .replace(/[\u0300-\u036f]/g, '');
   }
 
-  private loadPatients(): void {
+  private async loadPatients(): Promise<void> {
     const currentUser = this.authService.getCurrentUser();
     
     if (!currentUser) {

@@ -7,7 +7,7 @@ import { MiniGameService, MiniGame } from '../../services/mini-game.service';
 import { PatientService, Patient } from '../../services/patient.service';
 import { GameStatsService } from '../../services/game-stats.service';
 
-const SERVER_URL = 'http://localhost:3000';
+const SERVER_URL = `http://${window.location.hostname}:3000`;
 const DEFAULT_PROFILE_IMAGE = '/imgs/profile.jpg';
 
 export type LogStatus = 'pending' | 'success' | 'error';
@@ -46,7 +46,12 @@ export class SessionConfig implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.selectedMiniGame = this.miniGameService.getSelectedMiniGame();
     this.selectedPatient = this.patientService.getSelectedPatient();
-    this.patientImgSrc = this.selectedPatient?.profileImage || DEFAULT_PROFILE_IMAGE;
+    if (this.selectedPatient?.profileImage && this.selectedPatient.profileImage.startsWith('ProfilePictures/')) {
+      const filename = this.selectedPatient.profileImage.split('/')[1];
+      this.patientImgSrc = `${SERVER_URL}/profile-pictures/${filename}`;
+    } else {
+      this.patientImgSrc = this.selectedPatient?.profileImage || DEFAULT_PROFILE_IMAGE;
+    }
   }
 
   onPatientImageError(): void {

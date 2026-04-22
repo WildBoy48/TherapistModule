@@ -8,7 +8,7 @@ import { firstValueFrom } from 'rxjs';
 import { PatientService, Patient } from '../../services/patient.service';
 import { AuthService } from '../../services/auth.service';
 
-const LOCAL_SERVER = 'http://localhost:3000';
+const LOCAL_SERVER = `http://${window.location.hostname}:3000`;
 
 interface TherapySession {
   id: string;
@@ -70,7 +70,12 @@ export class PatientProfile implements OnInit {
   }
 
   private syncProfileImageSrc(): void {
-    this.profileImageSrc = this.patient?.profileImage || this.defaultProfileImage;
+    if (this.patient?.profileImage && this.patient.profileImage.startsWith('ProfilePictures/')) {
+      const filename = this.patient.profileImage.split('/')[1];
+      this.profileImageSrc = `${LOCAL_SERVER}/profile-pictures/${filename}`;
+    } else {
+      this.profileImageSrc = this.patient?.profileImage || this.defaultProfileImage;
+    }
   }
 
   private initializeNewPatientForm(): void {

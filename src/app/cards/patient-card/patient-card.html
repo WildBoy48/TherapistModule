@@ -1,5 +1,5 @@
-@if (isSelectable) {
-  <div class="card-wrapper selectable" (click)="selectPatient()" style="cursor: pointer;">
+@if (isSelectable || isExportMode) {
+  <div class="card-wrapper selectable" [class.selected]="isSelected" (click)="selectPatient()" style="cursor: pointer;">
     <div class="card">
       <img [src]="imgSrc" class="card-img-top" [alt]="patient.name" (error)="onImageError()">
       <div class="card-body">
