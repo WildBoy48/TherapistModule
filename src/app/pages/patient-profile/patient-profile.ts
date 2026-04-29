@@ -279,4 +279,11 @@ export class PatientProfile implements OnInit {
     // TODO: Implement repeat session flow.
     console.log('Repeat session:', sessionId);
   }
+
+  selectPatient(): void {
+    if (this.patient) {
+      this.patientService.setSelectedPatient(this.patient);
+      this.router.navigate(['/session-config']);
+    }
+  }
 }
