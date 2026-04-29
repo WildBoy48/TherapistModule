@@ -6,7 +6,8 @@
     <div class="col-auto">
       <input type="file" #fileInput (change)="importPatients($event)" accept=".json" style="display:none">
       <button type="button" class="btn btn-secondary me-2" (click)="fileInput.click()">Import</button>
-      <button type="button" class="btn btn-secondary me-2" (click)="toggleExportMode()">{{ isExportMode ? 'Cancel Export' : 'Export' }}</button>
+      <button type="button" class="btn btn-secondary me-2" (click)="toggleExportMode()" [disabled]="isDeleteMode">{{ isExportMode ? 'Cancel Export' : 'Export' }}</button>
+      <button type="button" class="btn btn-danger me-2" (click)="toggleDeleteMode()" [disabled]="isExportMode">{{ isDeleteMode ? 'Cancel Delete' : 'Delete' }}</button>
       <button type="button" class="btn btn-primary" (click)="addPatient()">Add Patient</button>
     </div>
   </div>
@@ -16,6 +17,15 @@
       <div class="col">
         <p>Select patients to export:</p>
         <button type="button" class="btn btn-success" (click)="exportSelected()" [disabled]="selectedPatients.size === 0">Export Selected</button>
+      </div>
+    </div>
+  }
+
+  @if (isDeleteMode) {
+    <div class="row mb-3">
+      <div class="col">
+        <p>Select patients to delete:</p>
+        <button type="button" class="btn btn-danger" (click)="deleteSelected()" [disabled]="selectedPatients.size === 0">Delete Selected</button>
       </div>
     </div>
   }
@@ -56,7 +66,7 @@
     <div class="row g-4">
       @for (patient of filteredPatients; track patient.id) {
         <div class="col-4 col-lg-3">
-          <app-patient-card [patient]="patient" [isSelectable]="!isExportMode" [isExportMode]="isExportMode" [isSelected]="selectedPatients.has(patient.id)" (patientSelected)="togglePatientSelection($event.id)"></app-patient-card>
+          <app-patient-card [patient]="patient" [isSelectable]="!isExportMode && !isDeleteMode" [isExportMode]="isExportMode" [isDeleteMode]="isDeleteMode" [isSelected]="selectedPatients.has(patient.id)" (patientSelected)="togglePatientSelection($event.id)"></app-patient-card>
         </div>
       }
     </div>

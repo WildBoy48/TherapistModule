@@ -16,6 +16,7 @@ export class PatientSelector implements OnInit {
   isLoading = true;
   error: string | null = null;
   isExportMode = false;
+  isDeleteMode = false;
   selectedPatients: Set<string> = new Set();
 
   constructor(
@@ -62,6 +63,13 @@ export class PatientSelector implements OnInit {
     }
   }
 
+  toggleDeleteMode(): void {
+    this.isDeleteMode = !this.isDeleteMode;
+    if (!this.isDeleteMode) {
+      this.selectedPatients.clear();
+    }
+  }
+
   togglePatientSelection(patientId: string): void {
     if (this.selectedPatients.has(patientId)) {
       this.selectedPatients.delete(patientId);
@@ -93,6 +101,34 @@ export class PatientSelector implements OnInit {
     URL.revokeObjectURL(url);
     this.isExportMode = false;
     this.selectedPatients.clear();
+  }
+
+  deleteSelected(): void {
+    if (this.selectedPatients.size === 0) {
+      alert('Please select at least one patient to delete.');
+      return;
+    }
+
+    const confirmDelete = confirm(`Are you sure you want to delete ${this.selectedPatients.size} patient(s)? This action cannot be undone.`);
+    if (!confirmDelete) {
+      return;
+    }
+
+    this.ngZone.run(async () => {
+      try {
+        for (const patientId of this.selectedPatients) {
+          await this.patientService.deletePatient(patientId);
+        }
+        await this.loadPatients();
+        alert('Selected patients deleted successfully.');
+      } catch (error) {
+        console.error('Delete error:', error);
+        alert('Failed to delete patients: ' + (error as Error).message);
+      } finally {
+        this.isDeleteMode = false;
+        this.selectedPatients.clear();
+      }
+    });
   }
 
   importPatients(event: Event): void {

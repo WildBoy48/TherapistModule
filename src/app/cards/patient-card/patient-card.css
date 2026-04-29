@@ -34,6 +34,11 @@
   box-shadow: 0 0 10px rgba(0, 128, 0, 0.5);
 }
 
+.card-wrapper.selected.delete-mode .card {
+  border: 3px solid red;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
 .card-body button {
   margin-top: 10px;
   width: 100%;

@@ -16,6 +16,7 @@ export class PatientCard implements OnChanges {
   @Input() patient!: Patient;
   @Input() isSelectable: boolean = false; // true when in patient-selector, false when in session-config
   @Input() isExportMode: boolean = false;
+  @Input() isDeleteMode: boolean = false;
   @Input() isSelected: boolean = false;
   @Output() patientSelected = new EventEmitter<Patient>();
 
@@ -42,7 +43,7 @@ export class PatientCard implements OnChanges {
   }
 
   selectPatient(): void {
-    if (this.isExportMode) {
+    if (this.isExportMode || this.isDeleteMode) {
       this.patientSelected.emit(this.patient);
     } else if (this.isSelectable) {
       this.patientService.setSelectedPatient(this.patient);
