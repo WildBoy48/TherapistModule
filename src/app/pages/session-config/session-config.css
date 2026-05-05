@@ -2,22 +2,9 @@
   min-height: calc(100vh - 3rem);
 }
 
-.session-body {
-  min-height: calc(100vh - 8rem);
-}
-
-.mini-game-column {
-  position: sticky;
-  top: 0;
-  align-self: start;
-  height: calc(100vh - 8rem);
-}
-
 .mini-game-panel {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  height: 100%;
   padding: 1rem;
   border: 1px solid #dee2e6;
   border-radius: 1rem;
@@ -48,7 +35,7 @@
 
 .selected-game-image {
   width: 100%;
-  height: 220px;
+  height: 10rem;
   object-fit: cover;
   border-bottom: 1px solid #e9ecef;
 }
@@ -76,7 +63,7 @@
 .empty-game-card {
   width: 100%;
   height: 100%;
-  min-height: 220px;
+  min-height: 5rem;
   border: 2px dashed #adb5bd;
   border-radius: 0.875rem;
   background: #ffffff;
@@ -154,6 +141,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
+  height: 100%;
   min-width: 170px;
 }
 

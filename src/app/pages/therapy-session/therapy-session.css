@@ -4,7 +4,7 @@
 }
 
 .session-container {
-  padding: 1.5rem;
+  padding: 0.5rem 1rem ;
   /* main-content has 1.5rem padding top + bottom = 3rem total */
   height: calc(100vh - 3rem);
   overflow: hidden;
