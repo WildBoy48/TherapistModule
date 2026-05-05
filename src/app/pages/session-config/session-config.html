@@ -66,8 +66,8 @@
                 <div class="card-header d-flex justify-content-between align-items-center gap-2 flex-wrap">
                     <h5 class="mb-0">Task Parameters</h5>
                     <div class="d-flex gap-2 ms-auto">
-                        <button type="button" class="btn btn-primary" disabled>Load Patient Parameters</button>
-                        <button type="button" class="btn btn-success" disabled>Save Patient Parameters</button>
+                        <button type="button" class="btn btn-primary" (click)="loadPatientParameters()" [disabled]="!selectedPatient || !selectedMiniGame || !patientConfigExists">Load Patient Parameters</button>
+                        <button type="button" class="btn btn-success" (click)="savePatientParameters()" [disabled]="!hasUnsavedChanges">Save Patient Parameters</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -77,21 +77,21 @@
                         </div>
                         <div class="col-12 col-md-6 mt-1 d-flex align-items-center gap-3">
                             <label for="taskTime" class="form-label mb-0 text-nowrap">Session Duration:</label>
-                            <input id="taskTime" type="number" min="0" class="form-control" placeholder="Enter time (seconds)">
+                            <input id="taskTime" type="number" min="0" class="form-control" [(ngModel)]="sessionDuration" (ngModelChange)="markDirty()" placeholder="Enter time (seconds)">
                         </div>
                         <div class="col-12 col-md-6 mt-1 d-flex align-items-center gap-3">
                             <label for="taskScore" class="form-label mb-0 text-nowrap">Target Score:</label>
-                            <input id="taskScore" type="number" min="0" class="form-control" placeholder="Enter target score">
+                            <input id="taskScore" type="number" min="0" class="form-control" [(ngModel)]="targetScore" (ngModelChange)="markDirty()" placeholder="Enter target score">
                         </div>
                         <div class="col-12 col-md-4">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="audioCues">
+                                <input class="form-check-input" type="checkbox" id="audioCues" [(ngModel)]="audioCues" (ngModelChange)="markDirty()">
                                 <label class="form-check-label" for="audioCues">Audio Cues</label>
                             </div>
                         </div>
                         <div class="col-12 col-md-4">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="visualCues">
+                                <input class="form-check-input" type="checkbox" id="visualCues" [(ngModel)]="visualCues" (ngModelChange)="markDirty()">
                                 <label class="form-check-label" for="visualCues">Visual Cues</label>
                             </div>
                         </div>
@@ -115,7 +115,7 @@
                         @if (selectedDevice === 'VR controllers') {
                             <div class="col-12 col-md-6 d-flex align-items-center mt-1">
                                 <div class="form-check form-switch d-flex align-items-center gap-2">
-                                    <input class="form-check-input" type="checkbox" id="hapticFeedback" [(ngModel)]="hapticFeedback">
+                                    <input class="form-check-input" type="checkbox" id="hapticFeedback" [(ngModel)]="hapticFeedback" (ngModelChange)="markDirty()">
                                     <label class="form-check-label text-nowrap" for="hapticFeedback">Haptic Feedback</label>
                                 </div>
                             </div>
@@ -123,14 +123,14 @@
                         @if (selectedDevice === 'BCI') {
                             <div class="col-12 col-md-6 d-flex align-items-center gap-3 mt-1">
                                 <label for="grippingTime" class="form-label mb-0 text-nowrap">Gripping Time:</label>
-                                <input id="grippingTime" type="number" min="0" class="form-control" [(ngModel)]="grippingTime" placeholder="Enter time (seconds)">
+                                <input id="grippingTime" type="number" min="0" class="form-control" [(ngModel)]="grippingTime" (ngModelChange)="markDirty()" placeholder="Enter time (seconds)">
                             </div>
                         }
                     </div>
                     <div class="row g-3 mt-3">
                             <div class="col-12 col-md-6 d-flex align-items-center gap-3 mt-0">
                             <label for="detailLevel" class="form-label mb-0 text-nowrap">Level Detail:</label>
-                            <select id="detailLevel" class="form-select" [(ngModel)]="selectedLevel">
+                            <select id="detailLevel" class="form-select" [(ngModel)]="selectedLevel" (ngModelChange)="markDirty()">
                                 <option value="" disabled hidden>Select level</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
@@ -139,8 +139,8 @@
                         </div>
                         <div class="col-12 col-md-6 d-flex align-items-center gap-3 mt-0">
                             <label for="seatHeight" class="form-label mb-0 text-nowrap">Seat Height:</label>
-                            <input id="seatHeight" type="range" min="0" max="1" step="0.01" class="form-range" [(ngModel)]="seatHeight">
-                            <input type="number" class="form-control" min="0" max="1" step="0.01" [(ngModel)]="seatHeight" style="width: 6rem;" placeholder="0.0-1.0">
+                            <input id="seatHeight" type="range" min="0" max="1" step="0.01" class="form-range" [(ngModel)]="seatHeight" (ngModelChange)="markDirty()">
+                            <input type="number" class="form-control" min="0" max="1" step="0.01" [(ngModel)]="seatHeight" (ngModelChange)="markDirty()" style="width: 6rem;" placeholder="0.0-1.0">
                         </div>
                     </div>
                     

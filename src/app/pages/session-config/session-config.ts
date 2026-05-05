@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 import { MiniGameService, MiniGame } from '../../services/mini-game.service';
-import { PatientService, Patient } from '../../services/patient.service';
+import { PatientService, Patient, PatientConfigDocument } from '../../services/patient.service';
 import { GameStatsService } from '../../services/game-stats.service';
 
 const SERVER_URL = `http://${window.location.hostname}:3000`;
@@ -30,6 +30,14 @@ export class SessionConfig implements OnInit, OnDestroy {
   seatHeight = 0.5;
   hapticFeedback = false;
   grippingTime: number | null = null;
+  sessionDuration = 0;
+  targetScore = 0;
+  audioCues = false;
+  visualCues = false;
+  configLoaded = false;
+  hasUnsavedChanges = false;
+  currentConfigId: string | null = null;
+  patientConfigExists = false;
 
   private _connectionSub: Subscription | null = null;
 
@@ -50,6 +58,8 @@ export class SessionConfig implements OnInit, OnDestroy {
     } else {
       this.patientImgSrc = this.selectedPatient?.profileImage || DEFAULT_PROFILE_IMAGE;
     }
+
+    this.loadPatientParameters();
     
     this._connectionSub = this.gameStats.connected$.subscribe(connected => {
       this.unityConnected = connected;
@@ -120,10 +130,97 @@ export class SessionConfig implements OnInit, OnDestroy {
     // Reset conditional fields when device changes
     this.hapticFeedback = false;
     this.grippingTime = null;
+    this.markDirty();
   }
 
   ngOnDestroy(): void {
     this._connectionSub?.unsubscribe();
+  }
+
+  async loadPatientParameters(): Promise<void> {
+    if (!this.selectedPatient || !this.selectedMiniGame) {
+      this.configLoaded = false;
+      return;
+    }
+
+    try {
+      const config: PatientConfigDocument | null = await this.patientService.getPatientConfig(this.selectedPatient.id, this.selectedMiniGame.id);
+      if (!config) {
+        console.warn('No patient configuration found for', this.selectedPatient.id, this.selectedMiniGame.id);
+        this.currentConfigId = null;
+        this.patientConfigExists = false;
+        this.configLoaded = false;
+        this.hasUnsavedChanges = true;
+        this.cdr.markForCheck();
+        return;
+      }
+
+      this.currentConfigId = config.id;
+      this.patientConfigExists = true;
+      this.audioCues = config.audioCues ?? false;
+      this.visualCues = config.visualCues ?? false;
+      this.sessionDuration = config.sessionDuration ?? 0;
+      this.targetScore = config.targetScore ?? 0;
+      this.selectedDevice = config.device ?? '';
+      this.selectedLevel = config.backgroundDetail != null ? config.backgroundDetail.toString() : '';
+      this.seatHeight = config.seat ?? this.seatHeight;
+      this.hapticFeedback = config.hapticFeedback ?? false;
+      this.grippingTime = config.bci_minGripTime ?? null;
+      this.configLoaded = true;
+      this.hasUnsavedChanges = false;
+      this.cdr.markForCheck();
+    } catch (error) {
+      console.error('Error loading patient configuration:', error);
+      this.currentConfigId = null;
+      this.patientConfigExists = false;
+      this.configLoaded = false;
+      this.hasUnsavedChanges = false;
+    }
+  }
+
+  markDirty(): void {
+    if (this.selectedPatient && this.selectedMiniGame) {
+      this.hasUnsavedChanges = true;
+    }
+  }
+
+  async savePatientParameters(): Promise<void> {
+    if (!this.selectedPatient || !this.selectedMiniGame) {
+      console.warn('Cannot save patient parameters without a selected patient and mini-game.');
+      return;
+    }
+
+    const config = {
+      audioCues: this.audioCues,
+      visualCues: this.visualCues,
+      sessionDuration: this.sessionDuration,
+      targetScore: this.targetScore,
+      device: this.selectedDevice,
+      backgroundDetail: this.selectedLevel ? Number(this.selectedLevel) : 0,
+      seat: this.seatHeight,
+      hapticFeedback: this.hapticFeedback,
+      bci_minGripTime: this.grippingTime ?? 0,
+    };
+
+    try {
+      if (this.currentConfigId) {
+        await this.patientService.updatePatientConfig(this.currentConfigId, config);
+        console.log('Patient parameters saved to document', this.currentConfigId);
+      } else {
+        const newConfigId = await this.patientService.createPatientConfig(
+          this.selectedPatient.id,
+          this.selectedMiniGame.id,
+          config
+        );
+        this.currentConfigId = newConfigId;
+        this.patientConfigExists = true;
+        console.log('Created patient config document', newConfigId);
+      }
+
+      this.hasUnsavedChanges = false;
+    } catch (error) {
+      console.error('Error saving patient parameters:', error);
+    }
   }
 
   calibrateMiniGame(): void {

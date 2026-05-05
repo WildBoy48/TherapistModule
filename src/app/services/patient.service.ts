@@ -13,11 +13,28 @@ export interface Patient {
   rehabilitationGoals?: string;
 }
 
+export interface PatientConfig {
+  audioCues: boolean;
+  backgroundDetail: number;
+  bci_minGripTime: number;
+  device: string;
+  hapticFeedback: boolean;
+  seat: number;
+  sessionDuration: number;
+  targetScore: number;
+  visualCues: boolean;
+}
+
+export interface PatientConfigDocument extends PatientConfig {
+  id: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class PatientService {
   private patientsCollection = 'patients';
+  private patientConfigsCollection = 'patient_configs';
   private selectedPatient: Patient | null = null;
 
   constructor(private firestore: Firestore, private ngZone: NgZone) {}
@@ -95,5 +112,41 @@ export class PatientService {
   async deletePatient(patientId: string): Promise<void> {
     const patientRef = doc(this.firestore, this.patientsCollection, patientId);
     await deleteDoc(patientRef);
+  }
+
+  async getPatientConfig(patientId: string, miniGameId: number): Promise<PatientConfigDocument | null> {
+    const patientConfigRef = collection(this.firestore, this.patientConfigsCollection);
+    const configQuery = query(
+      patientConfigRef,
+      where('patientID', '==', patientId),
+      where('miniGameID', '==', miniGameId)
+    );
+
+    const querySnapshot = await getDocs(configQuery);
+    if (querySnapshot.empty) {
+      return null;
+    }
+
+    // Assume only one config document exists per patient / mini-game combination.
+    const docSnapshot = querySnapshot.docs[0];
+    const configData = docSnapshot.data() as PatientConfig;
+    return { id: docSnapshot.id, ...configData };
+  }
+
+  async createPatientConfig(patientId: string, miniGameId: number, config: PatientConfig): Promise<string> {
+    const configRef = doc(collection(this.firestore, this.patientConfigsCollection));
+    const configWithRefs = {
+      patientID: patientId,
+      miniGameID: miniGameId,
+      ...config,
+    };
+
+    await setDoc(configRef, configWithRefs as { [key: string]: unknown });
+    return configRef.id;
+  }
+
+  async updatePatientConfig(configId: string, config: PatientConfig): Promise<void> {
+    const configRef = doc(this.firestore, this.patientConfigsCollection, configId);
+    await updateDoc(configRef, { ...config });
   }
 }
