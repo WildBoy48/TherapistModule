@@ -1,8 +1,8 @@
 import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { NgClass } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
 import { MiniGameService, MiniGame } from '../../services/mini-game.service';
 import { PatientService, Patient } from '../../services/patient.service';
 import { GameStatsService } from '../../services/game-stats.service';
@@ -10,16 +10,9 @@ import { GameStatsService } from '../../services/game-stats.service';
 const SERVER_URL = `http://${window.location.hostname}:3000`;
 const DEFAULT_PROFILE_IMAGE = '/imgs/profile.jpg';
 
-export type LogStatus = 'pending' | 'success' | 'error';
-
-export interface LogEntry {
-  message: string;
-  status: LogStatus;
-}
-
 @Component({
   selector: 'app-session-config',
-  imports: [RouterLink, NgClass],
+  imports: [RouterLink],
   templateUrl: './session-config.html',
   styleUrl: './session-config.css',
 })
@@ -28,9 +21,7 @@ export class SessionConfig implements OnInit, OnDestroy {
   selectedPatient: Patient | null = null;
   patientImgSrc: string = DEFAULT_PROFILE_IMAGE;
 
-  showSessionDialog = false;
-  sessionLogs: LogEntry[] = [];
-  sessionReady = false;
+  unityConnected = false;
 
   private _connectionSub: Subscription | null = null;
 
@@ -38,7 +29,6 @@ export class SessionConfig implements OnInit, OnDestroy {
     private miniGameService: MiniGameService,
     private patientService: PatientService,
     private router: Router,
-    private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private gameStats: GameStatsService
   ) {}
@@ -52,6 +42,11 @@ export class SessionConfig implements OnInit, OnDestroy {
     } else {
       this.patientImgSrc = this.selectedPatient?.profileImage || DEFAULT_PROFILE_IMAGE;
     }
+    
+    this._connectionSub = this.gameStats.connected$.subscribe(connected => {
+      this.unityConnected = connected;
+      this.cdr.markForCheck();
+    });
   }
 
   onPatientImageError(): void {
@@ -71,56 +66,69 @@ export class SessionConfig implements OnInit, OnDestroy {
     this.router.navigate(['/patient-profile']);
   }
 
-  private setLog(index: number, message: string, status: LogStatus): void {
-    const updated = [...this.sessionLogs];
-    updated[index] = { message, status };
-    this.sessionLogs = updated;
-    this.cdr.detectChanges();
-  }
-
   beginSession(): void {
-    this.sessionLogs = [{ message: 'Connecting to local server...', status: 'pending' }];
-    this.sessionReady = false;
-    this.showSessionDialog = true;
-
-    this.http.get(`${SERVER_URL}/status`).subscribe({
-      next: () => {
-        this.setLog(0, 'Connected to local server.', 'success');
-        this.sessionLogs = [...this.sessionLogs, { message: 'Waiting for Unity game...', status: 'pending' }];
-        this.cdr.detectChanges();
-
-        this.gameStats.connect();
-        this._connectionSub = this.gameStats.connected$.subscribe(connected => {
-          if (connected) {
-            this.setLog(1, 'Unity game connected.', 'success');
-            this.sessionReady = true;
-            this.cdr.detectChanges();
-            this._connectionSub?.unsubscribe();
-            this._connectionSub = null;
-          }
-        });
-      },
-      error: () => {
-        this.setLog(0, 'Could not reach local server. Make sure it is running.', 'error');
-      },
-    });
+    this.gameStats.sendCommand({ type: 'start_session' });
+    this.router.navigate(['/therapy-session']);
   }
 
   cancelSession(): void {
     this._connectionSub?.unsubscribe();
     this._connectionSub = null;
     this.gameStats.disconnect();
-    this.showSessionDialog = false;
-    this.sessionLogs = [];
-    this.sessionReady = false;
+  }
+
+  getCalibrationDisabledReason(): string {
+    if (!this.selectedMiniGame) {
+      return 'Please select a mini-game first';
+    }
+    if (!this.unityConnected) {
+      return 'Unity Server must be connected to calibrate';
+    }
+    return '';
+  }
+
+  isCalibrationDisabled(): boolean {
+    return !this.selectedMiniGame || !this.unityConnected;
+  }
+
+  getBeginSessionDisabledReason(): string {
+    if (!this.selectedMiniGame) {
+      return 'Please select a mini-game first';
+    }
+    if (!this.selectedPatient) {
+      return 'Please select a patient first';
+    }
+    if (!this.unityConnected) {
+      return 'Unity Server must be connected to begin session';
+    }
+    return '';
+  }
+
+  isBeginSessionDisabled(): boolean {
+    return !this.selectedMiniGame || !this.selectedPatient || !this.unityConnected;
   }
 
   ngOnDestroy(): void {
     this._connectionSub?.unsubscribe();
   }
 
+  calibrateMiniGame(): void {
+    if (!this.selectedMiniGame) {
+      return;
+    }
+
+    this.gameStats.connect();
+    this.gameStats.connected$
+      .pipe(
+        filter(connected => connected),
+        take(1)
+      )
+      .subscribe(() => {
+        this.gameStats.sendCommand({ type: 'load_scene', sceneID: this.selectedMiniGame!.sceneID });
+      });
+  }
+
   proceedToSession(): void {
-    this.showSessionDialog = false;
     this.router.navigate(['/therapy-session']);
   }
 }

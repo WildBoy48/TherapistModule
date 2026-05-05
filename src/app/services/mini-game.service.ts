@@ -7,6 +7,7 @@ export interface MiniGame {
   targetGroup: string;
   description: string;
   image: string;
+  sceneID: number;
 }
 
 @Injectable({

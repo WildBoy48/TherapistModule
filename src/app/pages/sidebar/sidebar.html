@@ -19,6 +19,19 @@
         <a class="nav-link" [class.disabled]="!isPatientSelected" routerLink="patient-profile" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [style.pointer-events]="isPatientSelected ? 'auto' : 'none'" [style.opacity]="isPatientSelected ? 1 : 0.5">Patient Profile</a>
       </li>
     </ul>
+
+    <div class="status-panel mt-4 px-3 py-3 border rounded bg-white">
+      <h6 class="status-title mb-3">Connection Status</h6>
+      <div class="status-row mb-2">
+        <span [class]="serverStatusClass"></span>
+        <span>{{ serverStatusLabel }}</span>
+      </div>
+      <div class="status-row">
+        <span [class]="unityStatusClass"></span>
+        <span>{{ unityStatusLabel }}</span>
+      </div>
+    </div>
+
     <button class="btn btn-link logout-btn" (click)="logout()">Logout</button>
   </div>
 </div>

@@ -104,39 +104,14 @@
         </div>
 
         <div class="col-12">
-            <div class="d-flex justify-content-center">
-                <button type="button" class="btn btn-success btn-lg" [disabled]="!selectedMiniGame || !selectedPatient" (click)="beginSession()">Begin Session</button>
+            <div class="d-flex gap-2 justify-content-center">
+                <div [title]="getCalibrationDisabledReason()" class="d-inline-block">
+                    <button type="button" class="btn btn-secondary btn-lg" [disabled]="isCalibrationDisabled()" (click)="calibrateMiniGame()">Calibration</button>
+                </div>
+                <div [title]="getBeginSessionDisabledReason()" class="d-inline-block">
+                    <button type="button" class="btn btn-success btn-lg" [disabled]="isBeginSessionDisabled()" (click)="beginSession()">Begin Session</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-@if (showSessionDialog) {
-    <div class="session-overlay" (click)="$event.target === $event.currentTarget && cancelSession()">
-        <div class="session-dialog">
-            <div class="session-dialog-header">
-                <h5 class="mb-0">Starting Session</h5>
-            </div>
-            <div class="session-dialog-body">
-                <ul class="session-log-list">
-                    @for (entry of sessionLogs; track $index) {
-                        <li class="session-log-entry" [ngClass]="entry.status">
-                            <span class="log-icon">
-                                @if (entry.status === 'pending') { <span class="spinner-border spinner-border-sm"></span> }
-                                @if (entry.status === 'success') { ✔ }
-                                @if (entry.status === 'error') { ✖ }
-                            </span>
-                            <span class="log-message">{{ entry.message }}</span>
-                        </li>
-                    }
-                </ul>
-            </div>
-            <div class="session-dialog-footer">
-                @if (sessionReady) {
-                    <button type="button" class="btn btn-success" (click)="proceedToSession()">Proceed to Session</button>
-                }
-                <button type="button" class="btn btn-danger" (click)="cancelSession()">Cancel Session</button>
-            </div>
-        </div>
-    </div>
-}

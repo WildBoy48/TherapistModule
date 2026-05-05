@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, NgZone } from '@angular/core';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
 export interface GameStats {
@@ -25,6 +25,8 @@ export class GameStatsService implements OnDestroy {
   private readonly _connected = new BehaviorSubject<boolean>(false);
   private readonly _messages = new Subject<GameStatsMessage>();
 
+  constructor(private ngZone: NgZone) {}
+
   /** Latest stats snapshot (null when no session is active) */
   readonly stats$: Observable<GameStats | null> = this._stats.asObservable();
 
@@ -37,11 +39,20 @@ export class GameStatsService implements OnDestroy {
   connect(): void {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) return;
 
-    this.ws = new WebSocket(WS_URL);
+    try {
+      this.ws = new WebSocket(WS_URL);
+    } catch (error) {
+      this.ngZone.run(() => this._connected.next(false));
+      console.error('GameStatsService WebSocket initialization failed', error);
+      return;
+    }
 
     this.ws.onopen = () => {
-      // Identify as an Angular viewer (no "client":"unity" → server treats as viewer)
-      this.ws!.send(JSON.stringify({ client: 'angular' }));
+      this.ngZone.run(() => {
+        if (this.ws) {
+          this.ws.send(JSON.stringify({ client: 'angular' }));
+        }
+      });
     };
 
     this.ws.onmessage = (event) => {
@@ -52,26 +63,28 @@ export class GameStatsService implements OnDestroy {
         return;
       }
 
-      this._messages.next(msg);
+      this.ngZone.run(() => {
+        this._messages.next(msg);
 
-      if (msg.type === 'unity_connected') {
-        this._connected.next(true);
-      } else if (msg.type === 'stats') {
-        this._stats.next(msg as GameStats);
-        this._connected.next(true);
-      } else if (msg.type === 'session_end' || msg.type === 'game_disconnected') {
-        this._stats.next(null);
-        this._connected.next(false);
-      }
+        if (msg.type === 'unity_connected') {
+          this._connected.next(true);
+        } else if (msg.type === 'stats') {
+          this._stats.next(msg as GameStats);
+          this._connected.next(true);
+        } else if (msg.type === 'session_end' || msg.type === 'game_disconnected') {
+          this._stats.next(null);
+          this._connected.next(false);
+        }
+      });
     };
 
     this.ws.onclose = () => {
-      this._connected.next(false);
+      this.ngZone.run(() => this._connected.next(false));
     };
 
     this.ws.onerror = (err) => {
+      this.ngZone.run(() => this._connected.next(false));
       console.error('GameStatsService WebSocket error', err);
-      this._connected.next(false);
     };
   }
 
