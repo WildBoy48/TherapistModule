@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
+import { FormsModule } from '@angular/forms';
 import { MiniGameService, MiniGame } from '../../services/mini-game.service';
 import { PatientService, Patient } from '../../services/patient.service';
 import { GameStatsService } from '../../services/game-stats.service';
@@ -12,7 +13,7 @@ const DEFAULT_PROFILE_IMAGE = '/imgs/profile.jpg';
 
 @Component({
   selector: 'app-session-config',
-  imports: [RouterLink],
+  imports: [RouterLink, FormsModule],
   templateUrl: './session-config.html',
   styleUrl: './session-config.css',
 })
@@ -22,6 +23,13 @@ export class SessionConfig implements OnInit, OnDestroy {
   patientImgSrc: string = DEFAULT_PROFILE_IMAGE;
 
   unityConnected = false;
+
+  // Patient specific parameters
+  selectedDevice = '';
+  selectedLevel = '';
+  seatHeight = 0.5;
+  hapticFeedback = false;
+  grippingTime: number | null = null;
 
   private _connectionSub: Subscription | null = null;
 
@@ -106,6 +114,12 @@ export class SessionConfig implements OnInit, OnDestroy {
 
   isBeginSessionDisabled(): boolean {
     return !this.selectedMiniGame || !this.selectedPatient || !this.unityConnected;
+  }
+
+  onDeviceChange(): void {
+    // Reset conditional fields when device changes
+    this.hapticFeedback = false;
+    this.grippingTime = null;
   }
 
   ngOnDestroy(): void {
