@@ -10,11 +10,24 @@ export interface GameStats {
   completed: boolean;
 }
 
+export interface GameConfig {
+  audioCues: boolean;
+  visualCues: boolean;
+  sessionDuration: number;
+  targetScore: number;
+  device: string;
+  backgroundDetail: number;
+  seat: number;
+  hapticFeedback: boolean;
+  bci_minGripTime: number;
+}
+
 export type GameStatsMessage =
   | GameStats
   | { type: 'unity_connected' }
   | { type: 'session_end' }
-  | { type: 'game_disconnected' };
+  | { type: 'game_disconnected' }
+  | { type: 'export_parameters'; config: Partial<GameConfig> };
 
 const WS_URL = 'ws://localhost:3000';
 

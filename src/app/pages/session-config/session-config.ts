@@ -38,8 +38,10 @@ export class SessionConfig implements OnInit, OnDestroy {
   hasUnsavedChanges = false;
   currentConfigId: string | null = null;
   patientConfigExists = false;
+  modeOverlay: 'calibration' | 'setup' | null = null;
 
   private _connectionSub: Subscription | null = null;
+  private _messageSub: Subscription | null = null;
 
   constructor(
     private miniGameService: MiniGameService,
@@ -65,6 +67,12 @@ export class SessionConfig implements OnInit, OnDestroy {
       this.unityConnected = connected;
       this.cdr.markForCheck();
     });
+
+    this._messageSub = this.gameStats.messages$.subscribe(msg => {
+      if (msg.type === 'export_parameters') {
+        this.applyExportedParameters(msg.config);
+      }
+    });
   }
 
   onPatientImageError(): void {
@@ -82,11 +90,6 @@ export class SessionConfig implements OnInit, OnDestroy {
 
   viewPatientProfile(): void {
     this.router.navigate(['/patient-profile']);
-  }
-
-  beginSession(): void {
-    this.gameStats.sendCommand({ type: 'start_session' });
-    this.router.navigate(['/therapy-session']);
   }
 
   cancelSession(): void {
@@ -107,6 +110,23 @@ export class SessionConfig implements OnInit, OnDestroy {
 
   isCalibrationDisabled(): boolean {
     return !this.selectedMiniGame || !this.unityConnected;
+  }
+
+  getSetupDisabledReason(): string {
+    if (!this.selectedMiniGame) {
+      return 'Please select a mini-game first';
+    }
+    if (!this.unityConnected) {
+      return 'Unity Server must be connected to setup the game';
+    }
+    if (!this.selectedPatient) {
+      return 'Please select a patient first';
+    }
+    return '';
+  }
+
+  isSetupDisabled(): boolean {
+    return !this.selectedMiniGame || !this.unityConnected || !this.selectedPatient;
   }
 
   getBeginSessionDisabledReason(): string {
@@ -131,10 +151,6 @@ export class SessionConfig implements OnInit, OnDestroy {
     this.hapticFeedback = false;
     this.grippingTime = null;
     this.markDirty();
-  }
-
-  ngOnDestroy(): void {
-    this._connectionSub?.unsubscribe();
   }
 
   async loadPatientParameters(): Promise<void> {
@@ -223,10 +239,29 @@ export class SessionConfig implements OnInit, OnDestroy {
     }
   }
 
-  calibrateMiniGame(): void {
+  setupMiniGame(): void {
     if (!this.selectedMiniGame) {
       return;
     }
+
+    const setupPayload = {
+      type: 'load_scene',
+      sceneID: this.selectedMiniGame.sceneID,
+      mode: 'setup',
+      miniGameID: this.selectedMiniGame.id,
+      patientID: this.selectedPatient?.id ?? '',
+      config: {
+        audioCues: this.audioCues,
+        visualCues: this.visualCues,
+        sessionDuration: this.sessionDuration,
+        targetScore: this.targetScore,
+        device: this.selectedDevice,
+        backgroundDetail: this.selectedLevel ? Number(this.selectedLevel) : 0,
+        seat: this.seatHeight,
+        hapticFeedback: this.hapticFeedback,
+        bci_minGripTime: this.grippingTime ?? 0,
+      },
+    };
 
     this.gameStats.connect();
     this.gameStats.connected$
@@ -235,11 +270,102 @@ export class SessionConfig implements OnInit, OnDestroy {
         take(1)
       )
       .subscribe(() => {
-        this.gameStats.sendCommand({ type: 'load_scene', sceneID: this.selectedMiniGame!.sceneID });
+        this.gameStats.sendCommand(setupPayload);
+        this.modeOverlay = 'setup';
       });
   }
 
-  proceedToSession(): void {
+  calibrateMiniGame(): void {
+    if (!this.selectedMiniGame) {
+      return;
+    }
+
+    const calibrationPayload = {
+      type: 'load_scene',
+      sceneID: this.selectedMiniGame.sceneID,
+      mode: 'calibration',
+      miniGameID: this.selectedMiniGame.id,
+      patientID: this.selectedPatient?.id ?? '',
+    };
+
+    this.gameStats.connect();
+    this.gameStats.connected$
+      .pipe(
+        filter(connected => connected),
+        take(1)
+      )
+      .subscribe(() => {
+        this.gameStats.sendCommand(calibrationPayload);
+        this.modeOverlay = 'calibration';
+      });
+  }
+
+  beginSession(): void {
+    if (!this.selectedMiniGame) {
+      return;
+    }
+
+    const sessionPayload = {
+      type: 'load_scene',
+      sceneID: this.selectedMiniGame.sceneID,
+      mode: 'session',
+      miniGameID: this.selectedMiniGame.id,
+      patientID: this.selectedPatient?.id ?? '',
+      config: {
+        audioCues: this.audioCues,
+        visualCues: this.visualCues,
+        sessionDuration: this.sessionDuration,
+        targetScore: this.targetScore,
+        device: this.selectedDevice,
+        backgroundDetail: this.selectedLevel ? Number(this.selectedLevel) : 0,
+        seat: this.seatHeight,
+        hapticFeedback: this.hapticFeedback,
+        bci_minGripTime: this.grippingTime ?? 0,
+      },
+    };
+
+    this.gameStats.connect();
+    this.gameStats.connected$
+      .pipe(
+        filter(connected => connected),
+        take(1)
+      )
+      .subscribe(() => {
+        this.gameStats.sendCommand(sessionPayload);
+      });
+
     this.router.navigate(['/therapy-session']);
+  }
+
+  stopMode(): void {
+    if (!this.unityConnected) {
+      return;
+    }
+
+    this.gameStats.sendCommand({ type: 'stop_mode' });
+    this.modeOverlay = null;
+  }
+
+  private applyExportedParameters(config: Partial<import('../../services/patient.service').PatientConfig>): void {
+    if (!config) {
+      return;
+    }
+
+    this.audioCues = config.audioCues ?? this.audioCues;
+    this.visualCues = config.visualCues ?? this.visualCues;
+    this.sessionDuration = config.sessionDuration ?? this.sessionDuration;
+    this.targetScore = config.targetScore ?? this.targetScore;
+    this.selectedDevice = config.device ?? this.selectedDevice;
+    this.selectedLevel = config.backgroundDetail != null ? String(config.backgroundDetail) : this.selectedLevel;
+    this.seatHeight = config.seat ?? this.seatHeight;
+    this.hapticFeedback = config.hapticFeedback ?? this.hapticFeedback;
+    this.grippingTime = config.bci_minGripTime ?? this.grippingTime;
+    this.hasUnsavedChanges = true;
+    this.cdr.markForCheck();
+  }
+
+  ngOnDestroy(): void {
+    this._connectionSub?.unsubscribe();
+    this._messageSub?.unsubscribe();
   }
 }

@@ -199,5 +199,39 @@
   }
 }
 
+.mode-blocker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.72);
+  pointer-events: auto;
+}
+
+.mode-blocker-card {
+  width: min(520px, 90vw);
+  padding: 2rem;
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.mode-blocker-card h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.mode-blocker-card p {
+  margin-bottom: 1.5rem;
+  color: #495057;
+}
+
+.mode-blocker-card .btn {
+  min-width: 180px;
+}
+
 /* ── No additional styles needed ─────────────────────────── */
 
