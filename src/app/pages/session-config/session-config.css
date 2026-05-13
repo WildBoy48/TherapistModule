@@ -250,7 +250,8 @@
 }
 
 .change-btn {
-    width: 8rem;
+    width: 10rem;
+    height: 3rem;
     display: flex;
     align-items: center;
     justify-content: center;

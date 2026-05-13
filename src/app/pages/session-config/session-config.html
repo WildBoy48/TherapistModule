@@ -32,7 +32,9 @@
                         </div>
                     </div>
                     <div class="col-auto">
-                        <button type="button" class="btn btn-warning change-btn" (click)="changeMiniGame()">Change</button>
+                        <button type="button" class="btn btn-warning change-btn" (click)="changeMiniGame()">
+                            Change Game
+                        </button>
                     </div>
                 </div>
                 } @else {
@@ -46,7 +48,7 @@
 
         <div class="col-12">
             @if (selectedPatient) {
-            <div class="row g-3 align-items-center">
+            <div class="row g-3 d-flex align-items-center justify-content-between">
                 <!-- Patient Card -->
                 <div class="col">
                     <button type="button" class="selected-patient-card" (click)="viewPatientProfile()">
@@ -65,9 +67,9 @@
                     </button>
                 </div>
                 <!-- Button -->
-                <div class="col-auto">
+                <div class="col-auto pe-4">
                     <div class="patient-buttons">
-                        <button type="button" class="btn btn-warning" (click)="changePatient()">
+                        <button type="button" class="btn btn-warning change-btn ms-auto" (click)="changePatient()">
                             Change Patient
                         </button>
                     </div>
