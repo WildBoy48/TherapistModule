@@ -4,7 +4,7 @@
     <span class="navbar-toggler-icon"></span>
   </button>
 
-  <div class="collapse navbar-collapse" id="navbarNav">
+  <div class="navbar-nav navbar" id="navbarNav">
     <ul class="navbar-nav ms-auto">
       <li class="nav-item">
         <a class="nav-link" routerLink="session-config" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Session Config</a>
@@ -32,6 +32,12 @@
       </div>
     </div>
 
-    <button class="btn btn-link logout-btn" (click)="logout()">Logout</button>
+    <label class="mt-2">Server IP Address</label>
+    <input type="text" [(ngModel)]="serverIp" [placeholder]="serverIp"/>
+    <button (click)="updateIp()" class="btn btn-primary mt-1">
+      Update Server IP
+    </button>
+
+    <button class="btn btn-link logout-btn d-flex" (click)="logout()">Logout</button>
   </div>
 </div>

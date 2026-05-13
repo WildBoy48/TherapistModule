@@ -6,8 +6,9 @@ import { catchError, startWith, switchMap } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { PatientService } from '../../services/patient.service';
 import { GameStatsService } from '../../services/game-stats.service';
+import { FormsModule } from '@angular/forms';
+import { ServerConfigService } from '../../services/server-config.service';
 
-const SERVER_URL = `http://${window.location.hostname}:3000`;
 
 interface ServerStatusResponse {
   server: boolean;
@@ -16,7 +17,7 @@ interface ServerStatusResponse {
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, FormsModule],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
@@ -25,22 +26,25 @@ export class Sidebar implements OnInit, OnDestroy {
   unityStatus: 'unknown' | 'connected' | 'disconnected' = 'unknown';
   private statusSubscription: Subscription | null = null;
   private unitySubscription: Subscription | null = null;
-
+  serverIp: string = '';
+  
   constructor(
     private authService: AuthService,
     private patientService: PatientService,
     private router: Router,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-    private gameStats: GameStatsService
+    private gameStats: GameStatsService,
+    private serverConfig: ServerConfigService
   ) {}
 
   ngOnInit(): void {
+    this.serverIp = this.serverConfig.getServerIp();
     this.statusSubscription = interval(5000)
       .pipe(
         startWith(0),
         switchMap(() =>
-          this.http.get<ServerStatusResponse>(`${SERVER_URL}/status`).pipe(
+          this.http.get<ServerStatusResponse>(`${this.serverConfig.getBaseUrl()}/status`).pipe(
             catchError(() => {
               this.serverStatus = 'offline';
               this.unityStatus = 'disconnected';
@@ -118,4 +122,17 @@ export class Sidebar implements OnInit, OnDestroy {
       console.error('Logout error:', error);
     }
   }
+
+  updateIp(): void {
+
+  const ipRegex =
+    /^(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/;
+
+  if (!ipRegex.test(this.serverIp)) {
+    alert('Invalid IP address');
+    return;
+  }
+  this.serverConfig.setServerIp(this.serverIp);
+  this.gameStats.connect();
+}
 }

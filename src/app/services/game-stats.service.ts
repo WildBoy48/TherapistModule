@@ -1,5 +1,6 @@
 import { Injectable, OnDestroy, NgZone } from '@angular/core';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { ServerConfigService } from './server-config.service';
 
 export interface GameStats {
   type: 'stats';
@@ -29,8 +30,6 @@ export type GameStatsMessage =
   | { type: 'game_disconnected' }
   | { type: 'export_parameters'; config: Partial<GameConfig> };
 
-const WS_URL = 'ws://localhost:3000';
-
 @Injectable({ providedIn: 'root' })
 export class GameStatsService implements OnDestroy {
   private ws: WebSocket | null = null;
@@ -38,7 +37,7 @@ export class GameStatsService implements OnDestroy {
   private readonly _connected = new BehaviorSubject<boolean>(false);
   private readonly _messages = new Subject<GameStatsMessage>();
 
-  constructor(private ngZone: NgZone) {}
+  constructor(private ngZone: NgZone, private serverConfig: ServerConfigService) {}
 
   /** Latest stats snapshot (null when no session is active) */
   readonly stats$: Observable<GameStats | null> = this._stats.asObservable();
@@ -53,7 +52,7 @@ export class GameStatsService implements OnDestroy {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) return;
 
     try {
-      this.ws = new WebSocket(WS_URL);
+      this.ws = new WebSocket(`ws://${this.serverConfig.getServerIp()}:3000`);
     } catch (error) {
       this.ngZone.run(() => this._connected.next(false));
       console.error('GameStatsService WebSocket initialization failed', error);

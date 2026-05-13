@@ -7,8 +7,8 @@ import { FormsModule } from '@angular/forms';
 import { MiniGameService, MiniGame } from '../../services/mini-game.service';
 import { PatientService, Patient, PatientConfigDocument } from '../../services/patient.service';
 import { GameStatsService } from '../../services/game-stats.service';
+import { ServerConfigService } from '../../services/server-config.service';
 
-const SERVER_URL = `http://${window.location.hostname}:3000`;
 const DEFAULT_PROFILE_IMAGE = '/imgs/profile.jpg';
 
 @Component({
@@ -27,7 +27,7 @@ export class SessionConfig implements OnInit, OnDestroy {
   // Patient specific parameters
   selectedDevice = '';
   selectedLevel = '';
-  seatHeight = 0.5;
+  seatHeight = 1.0;
   hapticFeedback = false;
   grippingTime: number | null = null;
   sessionDuration = 0;
@@ -48,7 +48,8 @@ export class SessionConfig implements OnInit, OnDestroy {
     private patientService: PatientService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private gameStats: GameStatsService
+    private gameStats: GameStatsService,
+    private serverConfig: ServerConfigService
   ) {}
 
   ngOnInit(): void {
@@ -56,7 +57,7 @@ export class SessionConfig implements OnInit, OnDestroy {
     this.selectedPatient = this.patientService.getSelectedPatient();
     if (this.selectedPatient?.profileImage && this.selectedPatient.profileImage.startsWith('ProfilePictures/')) {
       const filename = this.selectedPatient.profileImage.split('/')[1];
-      this.patientImgSrc = `${SERVER_URL}/profile-pictures/${filename}`;
+      this.patientImgSrc = `${this.serverConfig.getBaseUrl()}/profile-pictures/${filename}`;
     } else {
       this.patientImgSrc = this.selectedPatient?.profileImage || DEFAULT_PROFILE_IMAGE;
     }

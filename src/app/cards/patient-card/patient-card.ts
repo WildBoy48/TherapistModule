@@ -2,9 +2,9 @@ import { Component, Input, Output, EventEmitter, OnChanges, ChangeDetectorRef } 
 import { Router } from '@angular/router';
 import { Patient } from '../../services/patient.service';
 import { PatientService } from '../../services/patient.service';
+import { ServerConfigService } from '../../services/server-config.service';
 
 const DEFAULT_PROFILE_IMAGE = '/imgs/profile.jpg';
-const LOCAL_SERVER = `http://${window.location.hostname}:3000`;
 
 @Component({
   selector: 'app-patient-card',
@@ -25,13 +25,14 @@ export class PatientCard implements OnChanges {
   constructor(
     private patientService: PatientService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private serverConfig: ServerConfigService
   ) {}
 
   ngOnChanges(): void {
     if (this.patient?.profileImage && this.patient.profileImage.startsWith('ProfilePictures/')) {
       const filename = this.patient.profileImage.split('/')[1];
-      this.imgSrc = `${LOCAL_SERVER}/profile-pictures/${filename}`;
+      this.imgSrc = `${this.serverConfig.getBaseUrl()}/profile-pictures/${filename}`;
     } else {
       this.imgSrc = this.patient?.profileImage || DEFAULT_PROFILE_IMAGE;
     }

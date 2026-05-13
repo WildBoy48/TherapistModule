@@ -7,8 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { PatientService, Patient } from '../../services/patient.service';
 import { AuthService } from '../../services/auth.service';
-
-const LOCAL_SERVER = `http://${window.location.hostname}:3000`;
+import { ServerConfigService } from '../../services/server-config.service';
 
 interface TherapySession {
   id: string;
@@ -49,7 +48,8 @@ export class PatientProfile implements OnInit {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private authService: AuthService,
-    private http: HttpClient
+    private http: HttpClient,
+    private serverConfig: ServerConfigService
   ) {}
 
   ngOnInit(): void {
@@ -72,7 +72,7 @@ export class PatientProfile implements OnInit {
   private syncProfileImageSrc(): void {
     if (this.patient?.profileImage && this.patient.profileImage.startsWith('ProfilePictures/')) {
       const filename = this.patient.profileImage.split('/')[1];
-      this.profileImageSrc = `${LOCAL_SERVER}/profile-pictures/${filename}`;
+      this.profileImageSrc = `${this.serverConfig.getBaseUrl()}/profile-pictures/${filename}`;
     } else {
       this.profileImageSrc = this.patient?.profileImage || this.defaultProfileImage;
     }
@@ -129,7 +129,7 @@ export class PatientProfile implements OnInit {
     const formData = new FormData();
     formData.append('image', this.selectedFile);
     const res = await firstValueFrom(
-      this.http.post<{ url: string }>(`${LOCAL_SERVER}/upload-profile-picture`, formData)
+      this.http.post<{ url: string }>(`${this.serverConfig.getBaseUrl()}/upload-profile-picture`, formData)
     );
     return res.url;
   }

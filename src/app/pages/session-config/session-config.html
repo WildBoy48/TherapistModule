@@ -1,12 +1,12 @@
 <div class="container-fluid session-config px-0">
     @if (modeOverlay) {
-        <div class="mode-blocker-overlay">
-            <div class="mode-blocker-card">
-                <h3>{{ modeOverlay === 'calibration' ? 'Calibration Mode' : 'Setup Mode' }}</h3>
-                <p>The game is currently in {{ modeOverlay === 'calibration' ? 'calibration' : 'setup' }} mode.</p>
-                <button type="button" class="btn btn-danger" (click)="stopMode()">Stop and return to lobby</button>
-            </div>
+    <div class="mode-blocker-overlay">
+        <div class="mode-blocker-card">
+            <h3>{{ modeOverlay === 'calibration' ? 'Calibration Mode' : 'Setup Mode' }}</h3>
+            <p>The game is currently in {{ modeOverlay === 'calibration' ? 'calibration' : 'setup' }} mode.</p>
+            <button type="button" class="btn btn-danger" (click)="stopMode()">Stop and return to lobby</button>
         </div>
+    </div>
     }
 
     <div class="row mb-3">
@@ -19,55 +19,67 @@
         <div class="col-12">
             <div class="mini-game-panel">
                 @if (selectedMiniGame) {
-                    <div class="row align-items-center g-3">
-                        <div class="col-auto">
-                            <img [src]="selectedMiniGame.image" [alt]="selectedMiniGame.name" class="selected-game-image">
-                        </div>
-                        <div class="col">
-                            <div class="selected-game-content">
-                                <p class="game-id">Game #{{ selectedMiniGame.id }}</p>
-                                <h4>{{ selectedMiniGame.name }}</h4>
-                                <p class="target-group">{{ selectedMiniGame.targetGroup }}</p>
-                                <p class="description">{{ selectedMiniGame.description }}</p>
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <button type="button" class="btn btn-warning" (click)="changeMiniGame()">Change</button>
+                <div class="row align-items-center g-3">
+                    <div class="col-auto">
+                        <img [src]="selectedMiniGame.image" [alt]="selectedMiniGame.name" class="selected-game-image">
+                    </div>
+                    <div class="col">
+                        <div class="selected-game-content">
+                            <p class="game-id">Game #{{ selectedMiniGame.id }}</p>
+                            <h4>{{ selectedMiniGame.name }}</h4>
+                            <p class="target-group">{{ selectedMiniGame.targetGroup }}</p>
+                            <p class="description">{{ selectedMiniGame.description }}</p>
                         </div>
                     </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-warning change-btn" (click)="changeMiniGame()">Change</button>
+                    </div>
+                </div>
                 } @else {
-                    <button type="button" class="empty-game-card" (click)="changeMiniGame()">
-                        <h4>No mini-game selected</h4>
-                        <p>Click here to choose the mini-game</p>
-                    </button>
+                <button type="button" class="empty-game-card" (click)="changeMiniGame()">
+                    <h4>No mini-game selected</h4>
+                    <p>Click here to choose the mini-game</p>
+                </button>
                 }
             </div>
         </div>
 
         <div class="col-12">
             @if (selectedPatient) {
-                <div class="row g-3 align-items-start">
-                    <div class="col-12 col-xl">
-                        <button type="button" class="selected-patient-card" (click)="viewPatientProfile()">
-                            <img [src]="patientImgSrc" [alt]="selectedPatient.name" class="selected-patient-image" (error)="onPatientImageError()">
-                            <div class="selected-patient-content">
-                                <h4 class="patient-name">{{ selectedPatient.name }}</h4>
-                                <p class="patient-meta">{{ selectedPatient.gender }} - {{ selectedPatient.age }} years - {{ selectedPatient.handedness }}</p>
-                                <p class="patient-diagnosis">{{ selectedPatient.diagnosis }}</p>
-                            </div>
+            <div class="row g-3 align-items-center">
+                <!-- Patient Card -->
+                <div class="col">
+                    <button type="button" class="selected-patient-card" (click)="viewPatientProfile()">
+                        <img [src]="patientImgSrc" [alt]="selectedPatient.name" class="selected-patient-image" (error)="onPatientImageError()">
+                        <div class="selected-patient-content">
+                            <h4 class="patient-name">{{ selectedPatient.name }}</h4>
+                            <p class="patient-meta">
+                                {{ selectedPatient.gender }} -
+                                {{ selectedPatient.age }} years -
+                                {{ selectedPatient.handedness }}
+                            </p>
+                            <p class="patient-diagnosis">
+                                {{ selectedPatient.diagnosis }}
+                            </p>
+                        </div>
+                    </button>
+                </div>
+                <!-- Button -->
+                <div class="col-auto">
+                    <div class="patient-buttons">
+                        <button type="button" class="btn btn-warning" (click)="changePatient()">
+                            Change Patient
                         </button>
                     </div>
-                    <div class="col-12 col-xl-auto pt-1">
-                        <div class="patient-buttons">
-                            <button type="button" class="btn btn-warning" (click)="changePatient()">Change Patient</button>
-                        </div>
-                    </div>
                 </div>
+            </div>
             } @else {
-                <div class="empty-patient-state">
-                    <p>No patient selected...</p>
-                    <button type="button" class="btn btn-primary" routerLink="/patient-selector">Patient List</button>
-                </div>
+            <div class="empty-patient-state">
+                <p>No patient selected...</p>
+                <button type="button" class="btn btn-primary" routerLink="/patient-selector">
+                    Patient List
+                </button>
+            </div>
             }
         </div>
 
@@ -76,43 +88,54 @@
                 <div class="card-header d-flex justify-content-between align-items-center gap-2 flex-wrap">
                     <h5 class="mb-0">Task Parameters</h5>
                     <div class="d-flex gap-2 ms-auto">
-                        <button type="button" class="btn btn-primary" (click)="loadPatientParameters()" [disabled]="!selectedPatient || !selectedMiniGame || !patientConfigExists">Load Patient Parameters</button>
-                        <button type="button" class="btn btn-success" (click)="savePatientParameters()" [disabled]="!hasUnsavedChanges">Save Patient Parameters</button>
+                        <button type="button" class="btn btn-primary" (click)="loadPatientParameters()" [disabled]="!selectedPatient || !selectedMiniGame || !patientConfigExists">
+                            Load Patient Parameters
+                        </button>
+                        <button type="button" class="btn btn-success" (click)="savePatientParameters()" [disabled]="!hasUnsavedChanges">
+                            Save Patient Parameters
+                        </button>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="row g-3">
+                    <div class="row g-4 d-flex  ">
                         <div class="col-12">
                             <h6>General Parameters</h6>
                         </div>
-                        <div class="col-12 col-md-6 mt-1 d-flex align-items-center gap-3">
+                        <div class="col-auto mt-1 d-flex align-items-center gap-3">
                             <label for="taskTime" class="form-label mb-0 text-nowrap">Session Duration:</label>
-                            <input id="taskTime" type="number" min="0" class="form-control" [(ngModel)]="sessionDuration" (ngModelChange)="markDirty()" placeholder="Enter time (seconds)">
+                            <input id="taskTime" type="number" min="0" class="form-control" [(ngModel)]="sessionDuration" (ngModelChange)="markDirty()" placeholder="Enter time (minutes)"
+                                style="width: 4rem;">
                         </div>
-                        <div class="col-12 col-md-6 mt-1 d-flex align-items-center gap-3">
+                        <div class="col-auto mt-1 d-flex align-items-center gap-3">
                             <label for="taskScore" class="form-label mb-0 text-nowrap">Target Score:</label>
-                            <input id="taskScore" type="number" min="0" class="form-control" [(ngModel)]="targetScore" (ngModelChange)="markDirty()" placeholder="Enter target score">
+                            <input id="taskScore" type="number" min="0" class="form-control" [(ngModel)]="targetScore" (ngModelChange)="markDirty()" placeholder="Enter target score"
+                                style="width: 4rem;">
                         </div>
-                        <div class="col-12 col-md-4">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="audioCues" [(ngModel)]="audioCues" (ngModelChange)="markDirty()">
-                                <label class="form-check-label" for="audioCues">Audio Cues</label>
+                        <div class="col-auto d-flex align-items-center gap-3 mt-1">
+                            <div class="form-check form-switch d-flex align-items-center m-0">
+                                <input class="form-check-input large-switch" type="checkbox" id="audioCues" [(ngModel)]="audioCues" (ngModelChange)="markDirty()">
+                                <label class="form-check-label ms-2 mb-0" for="audioCues">
+                                    Audio Cues
+                                </label>
                             </div>
                         </div>
-                        <div class="col-12 col-md-4">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="visualCues" [(ngModel)]="visualCues" (ngModelChange)="markDirty()">
-                                <label class="form-check-label" for="visualCues">Visual Cues</label>
+                        <div class="col-auto d-flex align-items-center gap-3 mt-1">
+                            <div class="form-check form-switch d-flex align-items-center m-0">
+                                <input class="form-check-input large-switch" type="checkbox" id="visualCues" [(ngModel)]="visualCues" (ngModelChange)="markDirty()">
+
+                                <label class="form-check-label ms-2 mb-0" for="visualCues">
+                                    Visual Cues
+                                </label>
                             </div>
                         </div>
                     </div>
 
                     <!-- Patient Specific Parameters -->
-                    <div class="row g-3 mt-3">
+                    <div class="row g-3 mt-1">
                         <div class="col-12">
                             <h6>Patient Specific Parameters</h6>
                         </div>
-                        <div class="col-12 col-md-6 d-flex align-items-center gap-3 mt-1">
+                        <div class="col-auto d-flex align-items-center gap-3 mt-1">
                             <label for="deviceType" class="form-label mb-0 text-nowrap">Device Type:</label>
                             <select id="deviceType" class="form-select" [(ngModel)]="selectedDevice" (ngModelChange)="onDeviceChange()">
                                 <option value="" disabled hidden>Select device type</option>
@@ -121,39 +144,57 @@
                                 <option value="BCI">BCI</option>
                             </select>
                         </div>
-                        
+
                         @if (selectedDevice === 'VR controllers') {
-                            <div class="col-12 col-md-6 d-flex align-items-center mt-1">
-                                <div class="form-check form-switch d-flex align-items-center gap-2">
-                                    <input class="form-check-input" type="checkbox" id="hapticFeedback" [(ngModel)]="hapticFeedback" (ngModelChange)="markDirty()">
-                                    <label class="form-check-label text-nowrap" for="hapticFeedback">Haptic Feedback</label>
-                                </div>
+                        <div class="col-12 col-md-6 d-flex align-items-center mt-1">
+                            <div class="form-check form-switch d-flex align-items-center gap-2">
+                                <input class="form-check-input large-switch" type="checkbox" id="hapticFeedback" [(ngModel)]="hapticFeedback" (ngModelChange)="markDirty()">
+                                <label class="form-check-label ms-2 text-nowrap" for="hapticFeedback">Haptic Feedback</label>
                             </div>
+                        </div>
                         }
                         @if (selectedDevice === 'BCI') {
-                            <div class="col-12 col-md-6 d-flex align-items-center gap-3 mt-1">
-                                <label for="grippingTime" class="form-label mb-0 text-nowrap">Gripping Time:</label>
-                                <input id="grippingTime" type="number" min="0" class="form-control" [(ngModel)]="grippingTime" (ngModelChange)="markDirty()" placeholder="Enter time (seconds)">
-                            </div>
+                        <div class="col-12 col-md-6 d-flex align-items-center gap-3 mt-1">
+                            <label for="grippingTime" class="form-label mb-0 text-nowrap">Gripping Time:</label>
+                            <input id="grippingTime" type="number" min="0" class="form-control" [(ngModel)]="grippingTime" (ngModelChange)="markDirty()" placeholder="Enter time (seconds)"
+                                style="width: 12rem;">
+                        </div>
                         }
                     </div>
-                    <div class="row g-3 mt-3">
-                            <div class="col-12 col-md-6 d-flex align-items-center gap-3 mt-0">
-                            <label for="detailLevel" class="form-label mb-0 text-nowrap">Level Detail:</label>
-                            <select id="detailLevel" class="form-select" [(ngModel)]="selectedLevel" (ngModelChange)="markDirty()">
-                                <option value="" disabled hidden>Select level</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                            </select>
-                        </div>
-                        <div class="col-12 col-md-6 d-flex align-items-center gap-3 mt-0">
-                            <label for="seatHeight" class="form-label mb-0 text-nowrap">Seat Height:</label>
-                            <input id="seatHeight" type="range" min="0" max="1" step="0.01" class="form-range" [(ngModel)]="seatHeight" (ngModelChange)="markDirty()">
-                            <input type="number" class="form-control" min="0" max="1" step="0.01" [(ngModel)]="seatHeight" (ngModelChange)="markDirty()" style="width: 6rem;" placeholder="0.0-1.0">
+                    <div class="container-flex highlight-container p-3 mt-2">
+                        <div class="row g-3 align-items-center d-flex">
+
+                            <!-- Level Detail -->
+                            <div class="col-auto d-flex align-items-center gap-3">
+                                <label for="detailLevel" class="form-label mb-0 text-nowrap">Level Detail:</label>
+                                <select id="detailLevel" class="form-select form-select-sm w-auto" [(ngModel)]="selectedLevel" (ngModelChange)="markDirty()">
+                                    <option value="" disabled hidden>Select level</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                </select>
+                            </div>
+
+                            <!-- Seat Height -->
+                            <div class="col-auto d-flex align-items-center gap-3">
+                                <label for="seatHeight" class="form-label mb-0 text-nowrap">Seat Height:</label>
+
+                                <input id="seatHeight" type="range" min="0.8" max="1.2" step="0.01" class="form-range flex-grow-1" [(ngModel)]="seatHeight" (ngModelChange)="markDirty()">
+
+                                <input type="number" class="form-control" min="0.8" max="1.2" step="0.01" [(ngModel)]="seatHeight" (ngModelChange)="markDirty()" style="width: 4rem;">
+                            </div>
+
+                            <!-- Button -->
+                            <div class="col-auto d-flex">
+                                <div [title]="getSetupDisabledReason()">
+                                    <button type="button" class="btn btn-secondary btn-lg" [disabled]="isSetupDisabled()" (click)="setupMiniGame()">
+                                        Setup
+                                    </button>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
-                    
                 </div>
             </div>
         </div>
@@ -162,9 +203,6 @@
             <div class="d-flex gap-2 justify-content-center">
                 <div [title]="getCalibrationDisabledReason()" class="d-inline-block">
                     <button type="button" class="btn btn-secondary btn-lg" [disabled]="isCalibrationDisabled()" (click)="calibrateMiniGame()">Calibration</button>
-                </div>
-                <div [title]="getSetupDisabledReason()" class="d-inline-block">
-                    <button type="button" class="btn btn-secondary btn-lg" [disabled]="isSetupDisabled()" (click)="setupMiniGame()">Setup</button>
                 </div>
                 <div [title]="getBeginSessionDisabledReason()" class="d-inline-block">
                     <button type="button" class="btn btn-success btn-lg" [disabled]="isBeginSessionDisabled()" (click)="beginSession()">Begin Session</button>
