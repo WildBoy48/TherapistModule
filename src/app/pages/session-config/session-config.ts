@@ -99,9 +99,38 @@ export class SessionConfig implements OnInit, OnDestroy {
     this.gameStats.disconnect();
   }
 
+  getPatientParametersLoadDisabledReason(): string {
+    if (!this.selectedPatient) {
+      return 'Please select a patient first';
+    }
+    if (!this.selectedMiniGame) {
+      return 'Please select a mini-game first';
+    }
+    if (!this.patientConfigExists) {
+      return 'No saved parameters found for this patient and mini-game';
+    }
+    return '';
+  }
+
+    getPatientParametersSaveDisabledReason(): string {
+    if (!this.selectedPatient) {
+      return 'Please select a patient first';
+    }
+    if (!this.selectedMiniGame) {
+      return 'Please select a mini-game first';
+    }
+    if (!this.hasUnsavedChanges) {
+      return 'No unsaved changes to save';
+    }
+    return '';
+  }
+
   getCalibrationDisabledReason(): string {
     if (!this.selectedMiniGame) {
       return 'Please select a mini-game first';
+    }
+    if (this.selectedDevice == '') {
+      return 'Please select a device first';
     }
     if (!this.unityConnected) {
       return 'Unity Server must be connected to calibrate';
@@ -110,7 +139,7 @@ export class SessionConfig implements OnInit, OnDestroy {
   }
 
   isCalibrationDisabled(): boolean {
-    return !this.selectedMiniGame || !this.unityConnected;
+    return !this.selectedMiniGame || !this.unityConnected || this.selectedDevice == '';
   }
 
   getSetupDisabledReason(): string {
@@ -120,14 +149,14 @@ export class SessionConfig implements OnInit, OnDestroy {
     if (!this.unityConnected) {
       return 'Unity Server must be connected to setup the game';
     }
-    if (!this.selectedPatient) {
-      return 'Please select a patient first';
+    if (this.selectedDevice == ''){
+      return 'Please select a device first';
     }
     return '';
   }
 
   isSetupDisabled(): boolean {
-    return !this.selectedMiniGame || !this.unityConnected || !this.selectedPatient;
+    return !this.selectedMiniGame || !this.unityConnected || this.selectedDevice == '';
   }
 
   getBeginSessionDisabledReason(): string {

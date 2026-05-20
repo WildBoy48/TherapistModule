@@ -89,10 +89,12 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center gap-2 flex-wrap">
                     <h5 class="mb-0">Task Parameters</h5>
-                    <div class="d-flex gap-2 ms-auto">
+                    <div [title] = "getPatientParametersLoadDisabledReason()" class="d-flex gap-2 ms-auto">
                         <button type="button" class="btn btn-primary" (click)="loadPatientParameters()" [disabled]="!selectedPatient || !selectedMiniGame || !patientConfigExists">
                             Load Patient Parameters
                         </button>
+                    </div>
+                    <div [title]="getPatientParametersSaveDisabledReason()" class="d-inline-block">
                         <button type="button" class="btn btn-success" (click)="savePatientParameters()" [disabled]="!hasUnsavedChanges">
                             Save Patient Parameters
                         </button>
@@ -104,14 +106,14 @@
                             <h6>General Parameters</h6>
                         </div>
                         <div class="col-auto mt-1 d-flex align-items-center gap-3">
-                            <label for="taskTime" class="form-label mb-0 text-nowrap">Session Duration:</label>
-                            <input id="taskTime" type="number" min="0" class="form-control" [(ngModel)]="sessionDuration" (ngModelChange)="markDirty()" placeholder="Enter time (minutes)"
+                            <label for="taskTime" class="form-label mb-0 text-nowrap">Session Duration (mins):</label>
+                            <input id="taskTime" type="number" class="form-control" min="0" max="60"[(ngModel)]="sessionDuration" (ngModelChange)="markDirty()" placeholder="Enter time (minutes)"
                                 style="width: 4rem;">
                         </div>
                         <div class="col-auto mt-1 d-flex align-items-center gap-3">
                             <label for="taskScore" class="form-label mb-0 text-nowrap">Target Score:</label>
                             <input id="taskScore" type="number" min="0" class="form-control" [(ngModel)]="targetScore" (ngModelChange)="markDirty()" placeholder="Enter target score"
-                                style="width: 4rem;">
+                                style="width: 4.5rem;">
                         </div>
                         <div class="col-auto d-flex align-items-center gap-3 mt-1">
                             <div class="form-check form-switch d-flex align-items-center m-0">
@@ -181,9 +183,9 @@
                             <div class="col-auto d-flex align-items-center gap-3">
                                 <label for="seatHeight" class="form-label mb-0 text-nowrap">Seat Height:</label>
 
-                                <input id="seatHeight" type="range" min="0.8" max="1.2" step="0.01" class="form-range flex-grow-1" [(ngModel)]="seatHeight" (ngModelChange)="markDirty()">
+                                <input id="seatHeight" type="range" min="0.9" max="1.2" step="0.01" class="form-range flex-grow-1" [(ngModel)]="seatHeight" (ngModelChange)="markDirty()">
 
-                                <input type="number" class="form-control" min="0.8" max="1.2" step="0.01" [(ngModel)]="seatHeight" (ngModelChange)="markDirty()" style="width: 4rem;">
+                                <input type="number" class="form-control" min="0.9" max="1.2" step="0.01" [(ngModel)]="seatHeight" (ngModelChange)="markDirty()" style="width: 4.5rem;">
                             </div>
 
                             <!-- Button -->
