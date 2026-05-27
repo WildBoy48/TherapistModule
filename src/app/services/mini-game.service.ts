@@ -8,6 +8,7 @@ export interface MiniGame {
   description: string;
   image: string;
   sceneID: number;
+  detailLevels: number;
 }
 
 @Injectable({

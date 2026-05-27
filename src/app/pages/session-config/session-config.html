@@ -173,9 +173,9 @@
                                 <label for="detailLevel" class="form-label mb-0 text-nowrap">Level Detail:</label>
                                 <select id="detailLevel" class="form-select form-select-sm w-auto" [(ngModel)]="selectedLevel" (ngModelChange)="markDirty()">
                                     <option value="" disabled hidden>Select level</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
+                                    @for (level of getDetailLevelsArray(); track level) {
+                                    <option [value]="level">{{ level }}</option>
+                                    }
                                 </select>
                             </div>
 

@@ -192,6 +192,13 @@ export class SessionConfig implements OnInit, OnDestroy {
     this.markDirty();
   }
 
+  getDetailLevelsArray(): number[] {
+    if (!this.selectedMiniGame) {
+      return [];
+    }
+    return Array.from({ length: this.selectedMiniGame.detailLevels }, (_, i) => i + 1);
+  }
+
   async loadPatientParameters(): Promise<void> {
     if (!this.selectedPatient || !this.selectedMiniGame) {
       this.configLoaded = false;
