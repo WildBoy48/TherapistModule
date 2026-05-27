@@ -66,6 +66,9 @@ export class SessionConfig implements OnInit, OnDestroy {
     
     this._connectionSub = this.gameStats.connected$.subscribe(connected => {
       this.unityConnected = connected;
+      if (!connected && this.modeOverlay !== null) {
+        this.modeOverlay = null;
+      }
       this.cdr.markForCheck();
     });
 
@@ -135,11 +138,14 @@ export class SessionConfig implements OnInit, OnDestroy {
     if (!this.unityConnected) {
       return 'Unity Server must be connected to calibrate';
     }
+    if (!this.selectedPatient) {
+      return 'Please select a patient first';
+    }
     return '';
   }
 
   isCalibrationDisabled(): boolean {
-    return !this.selectedMiniGame || !this.unityConnected || this.selectedDevice == '';
+    return !this.selectedMiniGame || !this.unityConnected || this.selectedDevice == '' || !this.selectedPatient;
   }
 
   getSetupDisabledReason(): string {
@@ -149,14 +155,14 @@ export class SessionConfig implements OnInit, OnDestroy {
     if (!this.unityConnected) {
       return 'Unity Server must be connected to setup the game';
     }
-    if (this.selectedDevice == ''){
-      return 'Please select a device first';
+    if (!this.selectedPatient) {
+      return 'Please select a patient first';
     }
     return '';
   }
 
   isSetupDisabled(): boolean {
-    return !this.selectedMiniGame || !this.unityConnected || this.selectedDevice == '';
+    return !this.selectedMiniGame || !this.unityConnected || !this.selectedPatient;
   }
 
   getBeginSessionDisabledReason(): string {
@@ -169,11 +175,14 @@ export class SessionConfig implements OnInit, OnDestroy {
     if (!this.unityConnected) {
       return 'Unity Server must be connected to begin session';
     }
+    if (this.selectedDevice == '') {
+      return 'Please select a device first';
+    }
     return '';
   }
 
   isBeginSessionDisabled(): boolean {
-    return !this.selectedMiniGame || !this.selectedPatient || !this.unityConnected;
+    return !this.selectedMiniGame || !this.selectedPatient || !this.unityConnected || this.selectedDevice == '';
   }
 
   onDeviceChange(): void {
@@ -281,15 +290,8 @@ export class SessionConfig implements OnInit, OnDestroy {
       miniGameID: this.selectedMiniGame.id,
       patientID: this.selectedPatient?.id ?? '',
       config: {
-        audioCues: this.audioCues,
-        visualCues: this.visualCues,
-        sessionDuration: this.sessionDuration,
-        targetScore: this.targetScore,
-        device: this.selectedDevice,
-        backgroundDetail: this.selectedLevel ? Number(this.selectedLevel) : 0,
-        seat: this.seatHeight,
-        hapticFeedback: this.hapticFeedback,
-        bci_minGripTime: this.grippingTime ?? 0,
+        backgroundDetail: this.selectedLevel ? Number(this.selectedLevel) : 1,
+        seatHeight: this.seatHeight,
       },
     };
 
@@ -303,6 +305,13 @@ export class SessionConfig implements OnInit, OnDestroy {
         this.gameStats.sendCommand(setupPayload);
         this.modeOverlay = 'setup';
       });
+  }
+
+  async saveSetupMode(): Promise<void> {
+    // Call SaveSessionParameters() in MiniGameManager
+    this.gameStats.sendCommand({ type: 'save_session_parameters' });
+    // Do not close overlay or save patient parameters here —
+    // wait for Unity to send back the updated parameters (export_parameters)
   }
 
   calibrateMiniGame(): void {
@@ -348,7 +357,7 @@ export class SessionConfig implements OnInit, OnDestroy {
         targetScore: this.targetScore,
         device: this.selectedDevice,
         backgroundDetail: this.selectedLevel ? Number(this.selectedLevel) : 0,
-        seat: this.seatHeight,
+        seatHeight: this.seatHeight,
         hapticFeedback: this.hapticFeedback,
         bci_minGripTime: this.grippingTime ?? 0,
       },
@@ -369,6 +378,7 @@ export class SessionConfig implements OnInit, OnDestroy {
 
   stopMode(): void {
     if (!this.unityConnected) {
+      this.modeOverlay = null;
       return;
     }
 
@@ -381,6 +391,27 @@ export class SessionConfig implements OnInit, OnDestroy {
       return;
     }
 
+    // If we are in setup overlay, only update seat and background and close the overlay
+    if (this.modeOverlay === 'setup') {
+      this.selectedLevel = config.backgroundDetail != null ? String(config.backgroundDetail) : this.selectedLevel;
+
+      // Unity may send a single-precision float which serializes with extra digits;
+      // round to two decimals to match the UI slider precision
+      const seatRaw = (config as any).seat ?? (config as any).seatHeight;
+      if (seatRaw != null) {
+        const seatNum = Number(seatRaw);
+        if (!isNaN(seatNum)) {
+          this.seatHeight = Math.round(seatNum * 100) / 100;
+        }
+      }
+
+      this.hasUnsavedChanges = true;
+      this.modeOverlay = null;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    // Otherwise apply full exported configuration
     this.audioCues = config.audioCues ?? this.audioCues;
     this.visualCues = config.visualCues ?? this.visualCues;
     this.sessionDuration = config.sessionDuration ?? this.sessionDuration;
