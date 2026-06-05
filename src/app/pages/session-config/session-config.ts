@@ -332,6 +332,10 @@ export class SessionConfig implements OnInit, OnDestroy {
       mode: 'calibration',
       miniGameID: this.selectedMiniGame.id,
       patientID: this.selectedPatient?.id ?? '',
+      config: {
+        backgroundDetail: this.selectedLevel ? Number(this.selectedLevel) : 1,
+        seatHeight: this.seatHeight,
+      },
     };
 
     this.gameStats.connect();

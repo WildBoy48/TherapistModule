@@ -4,11 +4,17 @@ import { ServerConfigService } from './server-config.service';
 
 export interface GameStats {
   type: 'stats';
-  score: number;
-  timeElapsed: number;   // seconds
-  errors: number;
-  currentTask: string;
-  completed: boolean;
+  totalScore: number;
+  totalDrops: number;
+  totalMisses: number;
+  totalReps: number;
+  totalAccuracy: number;
+  repTotalTime: number;
+  repReactionTime: number;
+  repMovingTime: number;
+  repSpaceExplored: number;
+  repMaxHorizontalReach: number;
+  repIdealPathLength: number;
 }
 
 export interface GameConfig {
@@ -71,7 +77,9 @@ export class GameStatsService implements OnDestroy {
       let msg: GameStatsMessage;
       try {
         msg = JSON.parse(event.data as string);
+        //console.log('[GameStats] Message received:', msg);
       } catch {
+        //console.error('GameStatsService WebSocket message parsing failed', event.data);
         return;
       }
 

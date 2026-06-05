@@ -28,36 +28,32 @@
       </div>
     </div>
 
-    <!-- Middle: Graph + Session Log -->
+    <!-- Middle: Session Log -->
     <div class="col col-middle">
       <ng-container *ngIf="currentStats; else noStats">
-        <div class="graph-card panel">
-          <div class="graph-header">
-            <span class="panel-title">Score over Time</span>
-            <span class="graph-current-score">{{ currentStats.score }}</span>
-          </div>
-          <svg class="score-graph"
-               [attr.viewBox]="'0 0 ' + GRAPH_W + ' ' + GRAPH_H"
-               preserveAspectRatio="none">
-            <polyline
-              *ngIf="svgPolylinePoints"
-              [attr.points]="svgPolylinePoints"
-              fill="none"
-              stroke="#3949ab"
-              stroke-width="2"
-              stroke-linejoin="round"
-              stroke-linecap="round" />
-          </svg>
-        </div>
-
-        <div class="task-log-card panel">
-          <h3 class="panel-title">Session Log</h3>
-          <div class="task-log-scroll" #taskLogEl>
-            <div *ngFor="let entry of taskLog" class="task-log-entry">
-              <span class="log-time">{{ entry.timestamp }}</span>
-              <span class="log-task">{{ entry.task }}</span>
+        <div class="details-card panel">
+          <h3 class="panel-title">Session Details</h3>
+          <div class="details-list">
+            <div class="detail-item">
+              <span class="detail-label">Total Score</span>
+              <span class="detail-value">{{ currentStats.totalScore }}</span>
             </div>
-            <div *ngIf="taskLog.length === 0" class="log-empty">No tasks recorded yet.</div>
+            <div class="detail-item">
+              <span class="detail-label">Total Reps</span>
+              <span class="detail-value">{{ currentStats.totalReps }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Total Drops</span>
+              <span class="detail-value">{{ currentStats.totalDrops }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Total Misses</span>
+              <span class="detail-value">{{ currentStats.totalMisses }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Accuracy</span>
+              <span class="detail-value">{{ currentStats.totalAccuracy.toFixed(2) }}%</span>
+            </div>
           </div>
         </div>
       </ng-container>
@@ -70,23 +66,31 @@
     <!-- Right: Performance + Side Notes -->
     <div class="col col-right">
       <div class="panel performance-panel">
-        <h3 class="panel-title">Performance</h3>
+        <h3 class="panel-title">Rep Metrics</h3>
         <ng-container *ngIf="currentStats; else noPerf">
           <div class="perf-stat">
-            <span class="perf-label">Score</span>
-            <span class="perf-value">{{ currentStats.score }}</span>
+            <span class="perf-label">Rep Time</span>
+            <span class="perf-value">{{ currentStats.repTotalTime.toFixed(2) }}s</span>
           </div>
           <div class="perf-stat">
-            <span class="perf-label">Time Elapsed</span>
-            <span class="perf-value">{{ formatTime(currentStats.timeElapsed) }}</span>
+            <span class="perf-label">Reaction Time</span>
+            <span class="perf-value">{{ currentStats.repReactionTime.toFixed(2) }}s</span>
           </div>
           <div class="perf-stat">
-            <span class="perf-label">Errors</span>
-            <span class="perf-value perf-error">{{ currentStats.errors }}</span>
+            <span class="perf-label">Moving Time</span>
+            <span class="perf-value">{{ currentStats.repMovingTime.toFixed(2) }}s</span>
           </div>
           <div class="perf-stat">
-            <span class="perf-label">Status</span>
-            <span class="perf-value perf-status">{{ currentStats.completed ? 'Completed' : 'In Progress' }}</span>
+            <span class="perf-label">Space Explored</span>
+            <span class="perf-value">{{ currentStats.repSpaceExplored.toFixed(2) }}m</span>
+          </div>
+          <div class="perf-stat">
+            <span class="perf-label">Max Horizontal Reach</span>
+            <span class="perf-value">{{ currentStats.repMaxHorizontalReach.toFixed(2) }}m</span>
+          </div>
+          <div class="perf-stat">
+            <span class="perf-label">Ideal Path Length</span>
+            <span class="perf-value">{{ currentStats.repIdealPathLength.toFixed(2) }}m</span>
           </div>
         </ng-container>
         <ng-template #noPerf>
@@ -110,24 +114,24 @@
 
     <div *ngIf="sessionSummary" class="summary-grid">
       <div class="summary-row">
-        <span class="summary-label">Status</span>
-        <span class="summary-value">{{ sessionSummary.status }}</span>
-      </div>
-      <div class="summary-row">
         <span class="summary-label">Final Score</span>
         <span class="summary-value summary-score">{{ sessionSummary.finalScore }}</span>
       </div>
       <div class="summary-row">
-        <span class="summary-label">Total Time</span>
-        <span class="summary-value">{{ sessionSummary.totalTime }}</span>
+        <span class="summary-label">Total Reps</span>
+        <span class="summary-value">{{ sessionSummary.totalReps }}</span>
       </div>
       <div class="summary-row">
-        <span class="summary-label">Errors</span>
-        <span class="summary-value summary-error">{{ sessionSummary.errors }}</span>
+        <span class="summary-label">Total Drops</span>
+        <span class="summary-value">{{ sessionSummary.totalDrops }}</span>
       </div>
       <div class="summary-row">
-        <span class="summary-label">Tasks Logged</span>
-        <span class="summary-value">{{ sessionSummary.tasksCompleted }}</span>
+        <span class="summary-label">Total Misses</span>
+        <span class="summary-value">{{ sessionSummary.totalMisses }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Accuracy</span>
+        <span class="summary-value">{{ sessionSummary.totalAccuracy.toFixed(2) }}%</span>
       </div>
     </div>
 
