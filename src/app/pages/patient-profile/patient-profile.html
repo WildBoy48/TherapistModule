@@ -22,7 +22,7 @@
             <!-- View mode -->
             <div class="card-content" *ngIf="patient && !isEditing">
                 <div class="profile-header">
-                    <img [src]="profileImageSrc" alt="Profile" class="profile-image" (error)="onImageError($event)">
+                    <!-- <img [src]="profileImageSrc" alt="Profile" class="profile-image" (error)="onImageError($event)"> -->
                     <h2>{{ patient.name }}</h2>
                 </div>
                 <div class="info-section">
@@ -48,12 +48,12 @@
             <!-- Edit mode -->
             <div class="card-content edit-mode" *ngIf="patient && isEditing">
                 <div class="profile-header">
-                    <img *ngIf="imagePreviewUrl" [src]="imagePreviewUrl" alt="Profile Preview" class="profile-image" (error)="onImageError($event)">
-                    <img *ngIf="!imagePreviewUrl" [src]="profileImageSrc" alt="Profile" class="profile-image" (error)="onImageError($event)">
-                    <label class="change-photo-btn mt-2">
+                    <!-- <img *ngIf="imagePreviewUrl" [src]="imagePreviewUrl" alt="Profile Preview" class="profile-image" (error)="onImageError($event)"> -->
+                    <!-- <img *ngIf="!imagePreviewUrl" [src]="profileImageSrc" alt="Profile" class="profile-image" (error)="onImageError($event)"> -->
+                    <!-- <label class="change-photo-btn mt-2">
                         Change Photo
                         <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" (change)="onFileSelected($event)" style="display:none">
-                    </label>
+                    </label> -->
                 </div>
                 <div class="info-section">
                     <div class="info-item">
