@@ -62,4 +62,8 @@ export class MiniGameService {
   getSelectedMiniGame(): MiniGame | null {
     return this.selectedMiniGame;
   }
+
+  clearSelectedMiniGame(): void {
+    this.selectedMiniGame = null;
+  }
 }

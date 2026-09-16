@@ -83,6 +83,10 @@ export class PatientService {
     return this.selectedPatient;
   }
 
+  clearSelectedPatient(): void {
+    this.selectedPatient = null;
+  }
+
   /**
    * Update a patient's data in the database
    */

@@ -2,6 +2,9 @@ import { Injectable, NgZone } from '@angular/core';
 import { Auth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, User, authState } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import { UserService } from './user.service';
+import { PatientService } from './patient.service';
+import { MiniGameService } from './mini-game.service';
+import { GameStatsService } from './game-stats.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +13,14 @@ export class AuthService {
   public currentUser$: Observable<User | null>;
   private currentUser: User | null = null;
 
-  constructor(private auth: Auth, private userService: UserService, private ngZone: NgZone) {
+  constructor(
+    private auth: Auth,
+    private userService: UserService,
+    private patientService: PatientService,
+    private miniGameService: MiniGameService,
+    private gameStats: GameStatsService,
+    private ngZone: NgZone
+  ) {
     // Use AngularFire's authState observable which handles zone management
     this.currentUser$ = authState(this.auth);
     
@@ -18,6 +28,12 @@ export class AuthService {
     this.currentUser$.subscribe((user) => {
       this.ngZone.run(() => {
         this.currentUser = user;
+
+        if (!user) {
+          this.patientService.clearSelectedPatient();
+          this.miniGameService.clearSelectedMiniGame();
+          this.gameStats.disconnect();
+        }
         
         // Update last login when user logs in
         if (user) {
