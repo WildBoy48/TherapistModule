@@ -43,7 +43,9 @@ export class PatientCard implements OnChanges {
     this.cdr.markForCheck();
   }
 
-  selectPatient(): void {
+  selectPatient(event: Event): void {
+    event.stopPropagation();
+
     if (this.isExportMode || this.isDeleteMode) {
       this.patientSelected.emit(this.patient);
     } else if (this.isSelectable) {
